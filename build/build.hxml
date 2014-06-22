@@ -12,7 +12,6 @@
         <compilerflag value="-I./../include" />
 
         <!-- List of cpp files to be compiled -->
-        <file name="src/hx_libcurl.cpp" />
         <file name="src/hx_libcurl_easy.cpp" />
     </files>
 

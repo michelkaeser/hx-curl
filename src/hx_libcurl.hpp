@@ -13,8 +13,6 @@ extern "C"
     #define curl_error(ret)  val_throw(alloc_string(curl_easy_strerror(ret)))
     #define val_curl(v)      (CURL*)val_data(v)
     #define val_is_curl(v)   val_is_kind(v, k_curl_handle)
-
-    void finalize_curl_handle(value handle);
 }
 
 #endif
