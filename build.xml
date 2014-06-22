@@ -1,0 +1,72 @@
+<project name="hxcurl" default="exit" basedir=".">
+    <description>Haxe (C++/Neko) language bindings for libcurl.</description>
+
+    <property environment="env" />
+    <property name="workspace" location="${env.WORKSPACE}" />
+    <property name="api" location="${workspace}/api" />
+    <property name="src" location="${workspace}/src" />
+    <property name="build" location="${workspace}/build" />
+    <property name="reports"  location="${workspace}/reports" />
+
+    <target name="init" description="Creates the directories needed to store output">
+        <echo>Creating all required directories...</echo>
+        <mkdir dir="${reports}" />
+    </target>
+
+    <target name="build" depends="init" description="Builds the bindings">
+        <echo>Compiling the source code...</echo>
+        <exec executable="haxelib" resultproperty="build.code">
+            <arg value="run" />
+            <arg value="hxcpp" />
+            <arg value="${build}/build.hxml" />
+            <arg value="-DHXCPP_M64" />
+        </exec>
+        <condition property="build.failed">
+            <isfailure code="${build.code}" />
+        </condition>
+    </target>
+
+    <target name="cloc" depends="build" description="Counts the lines of code">
+        <echo>Counting lines of code...</echo>
+        <exec executable="cloc">
+            <arg value="--ignore-whitespace" />
+            <arg value="--read-lang-def=/usr/share/cloc/defs/haxe.txt" />
+            <arg value="--by-file" />
+            <arg value="--xml" />
+            <arg value="-out=${reports}/cloc.xml" />
+            <arg value="${api}" />
+            <arg value="${src}" />
+        </exec>
+
+        <exec executable="xsltproc">
+            <arg value="-o" />
+            <arg value="${reports}/sloccount.sc" />
+            <arg value="/usr/share/cloc/cloc2sloccount.xsl" />
+            <arg value="${reports}/cloc.xml" />
+        </exec>
+    </target>
+
+    <target name="checkstyle" depends="cloc" description="Runs the checkstyle analysis tool">
+        <echo>Performing Checkstyle analysis...</echo>
+        <exec executable="checkstyle">
+            <arg value="-c" />
+            <arg value="${build}/checkstyle.xml" />
+            <arg value="-f" />
+            <arg value="xml" />
+            <arg value="-o" />
+            <arg value="${reports}/checkstyle.xml" />
+            <arg value="-r" />
+            <arg value="${api}" />
+        </exec>
+    </target>
+
+    <target name="cleanup" depends="checkstyle" description="Removes compiled files and directories">
+        <echo>Removing (temporary) directories...</echo>
+        <delete dir="${workspace}/.temp" />
+    </target>
+
+    <target name="exit" depends="cleanup" description="Marks the build as failed if one of the targets failed">
+        <fail if="build.failed">Build step failed. Check output log for more information.</fail>
+        <echo>Everything went well. Good job!</echo>
+    </target>
+</project>

@@ -1,0 +1,12 @@
+# IDEA
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/*.iws
+
+# generated
+/bin
+/dist
+/ndll/**/*.ndll
+/obj
+/.temp
+/reports

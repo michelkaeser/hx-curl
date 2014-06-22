@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd"
+>
+<module name="Checker">
+    <property name="charset" value="UTF-8" />
+
+    <module name="FileLength" />
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true" />
+    </module>
+    <module name="NewlineAtEndOfFile" />
+    <module name="StrictDuplicateCode">
+        <property name="min" value="12" />
+        <property name="fileExtensions" value="hx" />
+    </module>
+    <module name="SuppressionFilter">
+        <property name="file" value="build/checkstyle_suppressions.xml" />
+    </module>
+</module>

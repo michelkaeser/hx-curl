@@ -1,0 +1,16 @@
+{
+    "name": "hxcurl",
+    "url" : "https://github.com/MaddinXx/hxcurl",
+    "license": "MIT",
+    "tags": ["curl", "ftp", "sftp", "dns", "mail", "http", "libcurl"],
+    "description": "Haxe (C++/Neko) language bindings for libcurl.",
+    "classPath": "api",
+    "dependencies": {
+        "hxstd": ""
+    },
+    "version": "0.1.0",
+    "releasenote": "Initial release",
+    "contributors": [
+        "MaddinXx"
+    ]
+}

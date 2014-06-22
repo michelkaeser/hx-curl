@@ -1,0 +1,39 @@
+<xml>
+    <include name="${HXCPP}/build-tool/BuildCommon.xml" />
+    <include name="${HXCPP}/toolchain/linux-toolchain.xml" if="linux" />
+    <include name="${HXCPP}/toolchain/mac-toolchain.xml" if="macos" />
+    <include name="${HXCPP}/toolchain/cygwin-toolchain.xml" if="windows" />
+
+    <set name="HXCPP_CPP11" value="1" />
+
+    <!-- Define all cpp files that need to be compiled into the nanomsg.ndll -->
+    <files id="files">
+        <!-- Set up include folder paths -->
+        <compilerflag value="-I./../include" />
+
+        <!-- List of cpp files to be compiled -->
+        <file name="src/hx_libcurl.cpp" />
+        <file name="src/hx_libcurl_easy.cpp" />
+    </files>
+
+    <!-- define compiler build & linking target -->
+    <target id="libcurl.ndll" tool="linker" toolid="dll" output="libcurl">
+        <ext value=".ndll" />
+
+        <!-- output directory for linker. -->
+        <!-- ${BINDIR} substituted by hxcpp build tool for your platform e.g. "Windows", "Mac64" -->
+        <outdir name="ndll/${BINDIR}" />
+
+        <!-- specific previously defined list of files to compile -->
+        <files id="files" />
+
+        <!-- link to libnanomsg installed through homebrew -->
+        <lib name="/usr/lib/libcurl.dylib" if="macos" />
+        <lib name="/usr/lib/libcurl.so" if="linux" />
+    </target>
+
+    <!-- specifies default hxcpp build tool target -->
+    <target id="default">
+        <target id="libcurl.ndll" />
+    </target>
+</xml>
