@@ -1,49 +1,61 @@
 #include "hx_libcurl_easy.hpp"
-#include <curl/curl.h>
 
 extern "C"
 {
-    static void finalize_easy_handle(value handle)
+    void finalize_curl_handle(CURL* curl)
     {
-        curl_easy_cleanup(val_curl(handle));
+        if (curl != NULL) {
+            curl_easy_cleanup(curl);
+        }
     }
 
 
     // http://curl.haxx.se/libcurl/c/curl_easy_cleanup.html
-    static value hxcurl_easy_cleanup(value handle)
+    static value hxcurl_easy_cleanup(value val)
     {
-        val_check_kind(handle, k_curl_handle);
-        finalize_easy_handle(handle);
+        val_check_kind(val, k_curl_struct);
+
+        struct S_CURL* curl = val_curl_struct(val);
+        if (curl->cleanup) {
+            finalize_curl_handle(curl->handle);
+            curl->cleanup = false;
+        } else {
+            neko_error();
+        }
 
         return alloc_null();
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_duphandle.html
-    static value hxcurl_easy_duphandle(value handle)
+    static value hxcurl_easy_duphandle(value val)
     {
-        val_check_kind(handle, k_curl_handle);
+        val_check_kind(val, k_curl_struct);
 
-        value val;
-        CURL* dup = curl_easy_duphandle(val_curl(handle));
-        if (dup == NULL) {
+        value dval;
+        struct S_CURL* curl = val_curl_struct(val);
+        CURL* dhandle = curl_easy_duphandle(curl->handle);
+        if (dhandle == NULL) {
             neko_error();
-            val = alloc_null();
+            dval = alloc_null();
         } else {
-            val = alloc_curl(dup);
-            val_gc(val, finalize_easy_handle);
+            struct S_CURL* dup = malloc_curl_struct();
+            dup->cleanup = curl->cleanup;
+            dup->handle  = dhandle;
+            dval = alloc_curl_struct(dup);
+            val_gc(dval, finalize_curl_struct);
         }
 
-        return val;
+        return dval;
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_escape.html
-    static value hxcurl_easy_escape(value handle, value str)
+    static value hxcurl_easy_escape(value curl, value str)
     {
-        val_check_kind(handle, k_curl_handle);
+        val_check_kind(curl, k_curl_struct);
         val_check(str, string);
 
         value val;
-        char* escaped = curl_easy_escape(val_curl(handle), val_string(str), val_strlen(str));
+        char* escaped = curl_easy_escape((val_curl_struct(curl))->handle, val_string(str), val_strlen(str));
         if (escaped == NULL) {
             neko_error();
             val = alloc_null();
@@ -69,51 +81,56 @@ extern "C"
             neko_error();
             val = alloc_null();
         } else {
-            val = alloc_curl(handle);
-            val_gc(val, finalize_easy_handle);
+            struct S_CURL* curl = malloc_curl_struct();
+            curl->cleanup = true;
+            curl->handle  = handle;
+            val = alloc_curl_struct(curl);
+            val_gc(val, finalize_curl_struct);
         }
 
         return val;
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_pause.html
-    static value hxcurl_easy_pause(value handle, value bitmask)
+    static value hxcurl_easy_pause(value curl, value bitmask)
     {
-        val_check_kind(handle, k_curl_handle);
+        val_check_kind(curl, k_curl_struct);
         val_check(bitmask, int);
 
-        CURLcode ret = curl_easy_pause(val_curl(handle), val_int(bitmask));
+        CURLcode ret = curl_easy_pause((val_curl_struct(curl))->handle, val_int(bitmask));
         if (ret != 0) {
-            curl_error(ret);
+            curl_easy_error(ret);
         }
 
         return alloc_null();
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_perform.html
-    static value hxcurl_easy_perform(value handle)
+    static value hxcurl_easy_perform(value curl)
     {
-        val_check_kind(handle, k_curl_handle);
+        val_check_kind(curl, k_curl_struct);
 
-        CURLcode ret = curl_easy_perform(val_curl(handle));
+        CURLcode ret = curl_easy_perform((val_curl_struct(curl))->handle);
         if (ret != 0) {
-            curl_error(ret);
+            curl_easy_error(ret);
         }
 
         return alloc_null();
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_recv.html
-    static value hxcurl_easy_recv(value handle, value length)
+    static value hxcurl_easy_recv(value curl, value length)
     {
-        val_check_kind(handle, k_curl_handle);
+        val_check_kind(curl, k_curl_struct);
+        val_check(length, int);
 
         value val;
+        const size_t buflen = val_int(length);
         size_t received;
-        char buffer[val_int(length)];
-        CURLcode ret = curl_easy_recv(val_curl(handle), &buffer, val_int(length), &received);
+        char buffer[buflen];
+        CURLcode ret = curl_easy_recv((val_curl_struct(curl))->handle, &buffer, buflen, &received);
         if (ret != 0) {
-            curl_error(ret);
+            curl_easy_error(ret);
         } else {
             val = alloc_string(buffer);
         }
@@ -123,25 +140,28 @@ extern "C"
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_reset.html
-    static value hxcurl_easy_reset(value handle)
+    static value hxcurl_easy_reset(value val)
     {
-        val_check_kind(handle, k_curl_handle);
-        curl_easy_reset(val_curl(handle));
+        val_check_kind(val, k_curl_struct);
+
+        struct S_CURL* curl = val_curl_struct(val);
+        curl_easy_reset(curl->handle);
+        curl->cleanup = true;
 
         return alloc_null();
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_send.html
-    static value hxcurl_easy_send(value handle, value msg)
+    static value hxcurl_easy_send(value curl, value msg)
     {
-        val_check_kind(handle, k_curl_handle);
+        val_check_kind(curl, k_curl_struct);
         val_check(msg, string);
 
         value val;
         size_t sent;
-        CURLcode ret = curl_easy_send(val_curl(handle), val_string(msg), val_strlen(msg), &sent);
+        CURLcode ret = curl_easy_send((val_curl_struct(curl))->handle, val_string(msg), val_strlen(msg), &sent);
         if (ret != 0) {
-            curl_error(ret);
+            curl_easy_error(ret);
             val = alloc_null();
         } else {
             val = alloc_int(sent);
@@ -166,13 +186,13 @@ extern "C"
     // }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_unescape.html
-    static value hxcurl_easy_unescape(value handle, value str)
+    static value hxcurl_easy_unescape(value curl, value str)
     {
-        val_check_kind(handle, k_curl_handle);
+        val_check_kind(curl, k_curl_struct);
         val_check(str, string);
 
         value val;
-        char* unescaped = curl_easy_unescape(val_curl(handle), val_string(str), val_strlen(str), NULL);
+        char* unescaped = curl_easy_unescape((val_curl_struct(curl))->handle, val_string(str), val_strlen(str), NULL);
         if (unescaped == NULL) {
             neko_error();
             val = alloc_null();

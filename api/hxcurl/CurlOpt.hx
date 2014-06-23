@@ -1,248 +1,222 @@
 package hxcurl;
 
 /**
+ * Abstract enums wrapping the various libcurl option codes.
  *
+ * @link http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
+ * @link https://github.com/bagder/curl/blob/ade380a7aa1241fd7a2e16ee0c44fe268b42ff9a/include/curl/curl.h
  */
 @:enum
 abstract CurlOpt(Int) from Int to Int
 {
-    // Behavior options
-    var VERBOSE
-    var HEADER
-    var NOPROGRESS
-    var NOSIGNAL
-    var WILDCARDMATCH
-
-    // Callback options
-    var WRITEFUNCTION
-    var WRITEDATA
-    var READFUNCTION
-    var READDATA
-    var IOCTLFUNCTION
-    var IOCTLDATA
-    var SEEKFUNCTION
-    var SEEKDATA
-    var SOCKOPTFUNCTION
-    var SOCKOPTDATA
-    var OPENSOCKETFUNCTION
-    var OPENSOCKETDATA
-    var CLOSESOCKETFUNCTION
-    var CLOSESOCKETDATA
-    var PROGRESSFUNCTION
-    var PROGRESSDATA
-    var XFERINFOFUNCTION
-    var XFERINFODATA
-    var HEADERFUNCTION
-    var HEADERDATA
-    var DEBUGFUNCTION
-    var DEBUGDATA
-    var SSL_CTX_FUNCTION
-    var SSL_CTX_DATA
-    var CONV_TO_NETWORK_FUNCTION
-    var CONV_FROM_NETWORK_FUNCTION
-    var CONV_FROM_UTF8_FUNCTION
-    var INTERLEAVEFUNCTION
-    var INTERLEAVEDATA
-    var CHUNK_BGN_FUNCTION
-    var CHUNK_END_FUNCTION
-    var CHUNK_DATA
-    var FNMATCH_FUNCTION
-    var FNMATCH_DATA
-
-    // Error options
-    var ERRORBUFFER
-    var STDERR
-    var FAILONERROR
-
-    // Network options
-    var URL
-    var PROTOCOLS
-    var REDIR_PROTOCOLS
-    var PROXY
-    var PROXYPORT
-    var PROXYTYPE
-    var NOPROXY
-    var HTTPPROXYTUNNEL
-    var SOCKS5_GSSAPI_SERVICE
-    var SOCKS5_GSSAPI_NEC
-    var INTERFACE
-    var LOCALPORT
-    var LOCALPORTRANGE
-    var DNS_CACHE_TIMEOUT
-    var DNS_USE_GLOBAL_CACHE
-    var BUFFERSIZE
-    var PORT
-    var TCP_NODELAY
-    var ADDRESS_SCOPE
-    var TCP_KEEPALIVE
-    var TCP_KEEPIDLE
-    var TCP_KEEPINTVL
-
-    // Authentication options
-    var NETRC
-    var NETRC_FILE
-    var USERPWD
-    var PROXYUSERPWD
-    var USERNAME
-    var PASSWORD
-    var LOGIN_OPTIONS
-    var PROXYUSERNAME
-    var PROXYPASSWORD
-    var HTTPAUTH
-    var TLSAUTH_USERNAME
-    var TLSAUTH_PASSWORD
-    var PROXYAUTH
-    var SASL_IR
-    var XOAUTH2_BEARER
-
-    // HTTP options
-    var AUTOREFERER
-    var ACCEPT_ENCODING
-    var TRANSFER_ENCODING
-    var FOLLOWLOCATION
-    var UNRESTRICTED_AUTH
-    var MAXREDIRS
-    var POSTREDIR
-    var PUT
-    var POST
-    var POSTFIELDS
-    var POSTFIELDSIZE
-    var POSTFIELDSIZE_LARGE
-    var COPYPOSTFIELDS
-    var HTTPPOST
-    var REFERER
-    var USERAGENT
-    var HTTPHEADER
-    var HEADEROPT
-    var PROXYHEADER
-    var HTTP200ALIASES
-    var COOKIE
-    var COOKIEFILE
-    var COOKIEJAR
-    var COOKIESESSION
-    var COOKIELIST
-    var HTTPGET
-    var HTTP_VERSION
-    var IGNORE_CONTENT_LENGTH
-    var HTTP_CONTENT_DECODING
-    var HTTP_TRANSFER_DECODING
-    var EXPECT_100_TIMEOUT_MS
-
-    // SMTP options
-    var MAIL_FROM
-    var MAIL_RCPT
-    var MAIL_AUTH
-
-    // TFTP options
-    var TFTP_BLKSIZE
-
-    // FTP options
-    var FTPPORT
-    var QUOTE
-    var POSTQUOTE
-    var PREQUOTE
-    var DIRLISTONLY
-    var APPEND
-    var FTP_USE_EPRT
-    var FTP_USE_EPSV
-    var FTP_USE_PRET
-    var FTP_CREATE_MISSING_DIRS
-    var FTP_RESPONSE_TIMEOUT
-    var FTP_ALTERNATIVE_TO_USER
-    var FTP_SKIP_PASV_IP
-    var FTPSSLAUTH
-    var FTP_SSL_CCC
-    var FTP_ACCOUNT
-    var FTP_FILEMETHOD
-
-    // RTSP options
-    var RTSP_REQUEST
-    var RTSP_SESSION_ID
-    var RTSP_STREAM_URI
-    var RTSP_TRANSPORT
-    var RTSP_CLIENT_CSEQ
-    var RTSP_SERVER_CSEQ
-
-    // Protocol options
-    var TRANSFERTEXT
-    var PROXY_TRANSFER_MODE
-    var CRLF
-    var RANGE
-    var RESUME_FROM
-    var RESUME_FROM_LARGE
-    var CUSTOMREQUEST
-    var FILETIME
-    var NOBODY
-    var INFILESIZE
-    var INFILESIZE_LARGE
-    var UPLOAD
-    var MAXFILESIZE
-    var MAXFILESIZE_LARGE
-    var TIMECONDITION
-    var TIMEVALUE
-
-    // Connect options
-    var TIMEOUT
-    var TIMEOUT_MS
-    var LOW_SPEED_LIMIT
-    var LOW_SPEED_TIME
-    var MAX_SEND_SPEED_LARGE
-    var MAX_RECV_SPEED_LARGE
-    var MAXCONNECTS
-    var FRESH_CONNECT
-    var FORBID_REUSE
-    var CONNECTTIMEOUT
-    var CONNECTTIMEOUT_MS
-    var IPRESOLVE
-    var CONNECT_ONLY
-    var USE_SSL
-    var RESOLVE
-    var DNS_INTERFACE
-    var DNS_LOCAL_IP4
-    var DNS_LOCAL_IP6
-    var ACCEPTTIMEOUT_MS
-
-    // SSL and security options
-    var SSLCERT
-    var SSLCERTTYPE
-    var SSLKEY
-    var SSLKEYTYPE
-    var KEYPASSWD
-    var SSL_ENABLE_ALPN
-    var SSL_ENABLE_NPN
-    var SSLENGINE
-    var SSLENGINE_DEFAULT
-    var SSLVERSION
-    var SSL_VERIFYPEER
-    var CAINFO
-    var ISSUERCERT
-    var CAPATH
-    var CRLFILE
-    var SSL_VERIFYHOST
-    var CERTINFO
-    var RANDOM_FILE
-    var EGDSOCKET
-    var SSL_CIPHER_LIST
-    var SSL_SESSIONID_CACHE
-    var SSL_OPTIONS
-    var KRBLEVEL
-    var GSSAPI_DELEGATION
-
-    // SSH options
-    var SSH_AUTH_TYPES
-    var SSH_HOST_PUBLIC_KEY_MD5
-    var SSH_PUBLIC_KEYFILE
-    var SSH_PRIVATE_KEYFILE
-    var SSH_KNOWNHOSTS
-    var SSH_KEYFUNCTION
-    var SSH_KEYDATA
-
-    // Other options
-    var PRIVATE
-    var SHARE
-    var NEW_FILE_PERMS
-    var NEW_DIRECTORY_PERMS
-
-    // Telnet options
-    var TELNETOPTIONS
+    var WRITEDATA                  = 1;
+    var URL                        = 2;
+    var PORT                       = 3;
+    var PROXY                      = 4;
+    var USERPWD                    = 5;
+    var PROXYUSERPWD               = 6;
+    var RANGE                      = 7;
+    var READDATA                   = 9;
+    var ERRORBUFFER                = 10;
+    var WRITEFUNCTION              = 11;
+    var READFUNCTION               = 12;
+    var TIMEOUT                    = 13;
+    var INFILESIZE                 = 14;
+    var POSTFIELDS                 = 15;
+    var REFERER                    = 16;
+    var FTPPORT                    = 17;
+    var USERAGENT                  = 18;
+    var LOW_SPEED_LIMIT            = 19;
+    var LOW_SPEED_TIME             = 20;
+    var RESUME_FROM                = 21;
+    var COOKIE                     = 22;
+    var HTTPHEADER                 = 23;
+    var HTTPPOST                   = 24;
+    var SSLCERT                    = 25;
+    var KEYPASSWD                  = 26;
+    var CRLF                       = 27;
+    var QUOTE                      = 28;
+    var HEADERDATA                 = 29;
+    var COOKIEFILE                 = 31;
+    var SSLVERSION                 = 32;
+    var TIMECONDITION              = 33;
+    var TIMEVALUE                  = 34;
+    var CUSTOMREQUEST              = 36;
+    var STDERR                     = 37;
+    var POSTQUOTE                  = 39;
+    var VERBOSE                    = 41;
+    var HEADER                     = 42;
+    var NOPROGRESS                 = 43;
+    var NOBODY                     = 44;
+    var FAILONERROR                = 45;
+    var UPLOAD                     = 46;
+    var POST                       = 47;
+    var DIRLISTONLY                = 48;
+    var APPEND                     = 50;
+    var NETRC                      = 51;
+    var FOLLOWLOCATION             = 52;
+    var TRANSFERTEXT               = 53;
+    var PUT                        = 54;
+    var PROGRESSFUNCTION           = 56;
+    var PROGRESSDATA               = 57;
+    var XFERINFODATA               = CurlOpt.PROGRESSDATA
+    var AUTOREFERER                = 58;
+    var PROXYPORT                  = 59;
+    var POSTFIELDSIZE              = 60;
+    var HTTPPROXYTUNNEL            = 61;
+    var INTERFACE                  = 62;
+    var KRBLEVEL                   = 63;
+    var SSL_VERIFYPEER             = 64;
+    var CAINFO                     = 65;
+    var MAXREDIRS                  = 68;
+    var FILETIME                   = 69;
+    var TELNETOPTIONS              = 70;
+    var MAXCONNECTS                = 71;
+    var FRESH_CONNECT              = 74;
+    var FORBID_REUSE               = 75;
+    var RANDOM_FILE                = 76;
+    var EGDSOCKET                  = 77;
+    var CONNECTTIMEOUT             = 78;
+    var HEADERFUNCTION             = 79;
+    var HTTPGET                    = 80;
+    var SSL_VERIFYHOST             = 81;
+    var COOKIEJAR                  = 82;
+    var SSL_CIPHER_LIST            = 83;
+    var HTTP_VERSION               = 84;
+    var FTP_USE_EPSV               = 85;
+    var SSLCERTTYPE                = 86;
+    var SSLKEY                     = 87;
+    var SSLKEYTYPE                 = 88;
+    var SSLENGINE                  = 89;
+    var SSLENGINE_DEFAULT          = 90;
+    var DNS_USE_GLOBAL_CACHE       = 91;
+    var DNS_CACHE_TIMEOUT          = 92;
+    var PREQUOTE                   = 93;
+    var DEBUGFUNCTION              = 94;
+    var DEBUGDATA                  = 95;
+    var COOKIESESSION              = 96;
+    var CAPATH                     = 97;
+    var BUFFERSIZE                 = 98;
+    var NOSIGNAL                   = 99;
+    var SHARE                      = 100;
+    var PROXYTYPE                  = 101;
+    var ACCEPT_ENCODING            = 102;
+    var PRIVATE                    = 103;
+    var HTTP200ALIASES             = 104;
+    var UNRESTRICTED_AUTH          = 105;
+    var FTP_USE_EPRT               = 106;
+    var HTTPAUTH                   = 107;
+    var SSL_CTX_FUNCTION           = 108;
+    var SSL_CTX_DATA               = 109;
+    var FTP_CREATE_MISSING_DIRS    = 110;
+    var PROXYAUTH                  = 111;
+    var FTP_RESPONSE_TIMEOUT       = 112;
+    var IPRESOLVE                  = 113;
+    var MAXFILESIZE                = 114;
+    var INFILESIZE_LARGE           = 115;
+    var RESUME_FROM_LARGE          = 116;
+    var MAXFILESIZE_LARGE          = 117;
+    var NETRC_FILE                 = 118;
+    var USE_SSL                    = 119;
+    var POSTFIELDSIZE_LARGE        = 120;
+    var TCP_NODELAY                = 121;
+    var FTPSSLAUTH                 = 129;
+    var IOCTLFUNCTION              = 130;
+    var IOCTLDATA                  = 131;
+    var FTP_ACCOUNT                = 134;
+    var COOKIELIST                 = 135;
+    var IGNORE_CONTENT_LENGTH      = 136;
+    var FTP_SKIP_PASV_IP           = 137;
+    var FTP_FILEMETHOD             = 138;
+    var LOCALPORT                  = 139;
+    var LOCALPORTRANGE             = 140;
+    var CONNECT_ONLY               = 141;
+    var CONV_FROM_NETWORK_FUNCTION = 142;
+    var CONV_TO_NETWORK_FUNCTION   = 143;
+    var CONV_FROM_UTF8_FUNCTION    = 144;
+    var MAX_SEND_SPEED_LARGE       = 145;
+    var MAX_RECV_SPEED_LARGE       = 146;
+    var FTP_ALTERNATIVE_TO_USER    = 147;
+    var SOCKOPTFUNCTION            = 148;
+    var SOCKOPTDATA                = 149;
+    var SSL_SESSIONID_CACHE        = 150;
+    var SSH_AUTH_TYPES             = 151;
+    var SSH_PUBLIC_KEYFILE         = 152;
+    var SSH_PRIVATE_KEYFILE        = 153;
+    var FTP_SSL_CCC                = 154;
+    var TIMEOUT_MS                 = 155;
+    var CONNECTTIMEOUT_MS          = 156;
+    var HTTP_TRANSFER_DECODING     = 157;
+    var HTTP_CONTENT_DECODING      = 158;
+    var NEW_FILE_PERMS             = 159;
+    var NEW_DIRECTORY_PERMS        = 160;
+    var POSTREDIR                  = 161;
+    var SSH_HOST_PUBLIC_KEY_MD5    = 162;
+    var OPENSOCKETFUNCTION         = 163;
+    var OPENSOCKETDATA             = 164;
+    var COPYPOSTFIELDS             = 165;
+    var PROXY_TRANSFER_MODE        = 166;
+    var SEEKFUNCTION               = 167;
+    var SEEKDATA                   = 168;
+    var CRLFILE                    = 169;
+    var ISSUERCERT                 = 170;
+    var ADDRESS_SCOPE              = 171;
+    var CERTINFO                   = 172;
+    var USERNAME                   = 173;
+    var PASSWORD                   = 174;
+    var PROXYUSERNAME              = 175;
+    var PROXYPASSWORD              = 176;
+    var NOPROXY                    = 177;
+    var TFTP_BLKSIZE               = 178;
+    var SOCKS5_GSSAPI_SERVICE      = 179;
+    var SOCKS5_GSSAPI_NEC          = 180;
+    var PROTOCOLS                  = 181;
+    var REDIR_PROTOCOLS            = 182;
+    var SSH_KNOWNHOSTS             = 183;
+    var SSH_KEYFUNCTION            = 184;
+    var SSH_KEYDATA                = 185;
+    var MAIL_FROM                  = 186;
+    var MAIL_RCPT                  = 187;
+    var FTP_USE_PRET               = 188;
+    var RTSP_REQUEST               = 189;
+    var RTSP_SESSION_ID            = 190;
+    var RTSP_STREAM_URI            = 191;
+    var RTSP_TRANSPORT             = 192;
+    var RTSP_CLIENT_CSEQ           = 193;
+    var RTSP_SERVER_CSEQ           = 194;
+    var INTERLEAVEDATA             = 195;
+    var INTERLEAVEFUNCTION         = 196;
+    var WILDCARDMATCH              = 197;
+    var CHUNK_BGN_FUNCTION         = 198;
+    var CHUNK_END_FUNCTION         = 199;
+    var FNMATCH_FUNCTION           = 200;
+    var CHUNK_DATA                 = 201;
+    var FNMATCH_DATA               = 202;
+    var RESOLVE                    = 203;
+    var TLSAUTH_USERNAME           = 204;
+    var TLSAUTH_PASSWORD           = 205;
+    var TLSAUTH_TYPE               = 206;
+    var TRANSFER_ENCODING          = 207;
+    var CLOSESOCKETFUNCTION        = 208;
+    var CLOSESOCKETDATA            = 209;
+    var GSSAPI_DELEGATION          = 210;
+    var DNS_SERVERS                = 211;
+    var ACCEPTTIMEOUT_MS           = 212;
+    var TCP_KEEPALIVE              = 213;
+    var TCP_KEEPIDLE               = 214;
+    var TCP_KEEPINTVL              = 215;
+    var SSL_OPTIONS                = 216;
+    var MAIL_AUTH                  = 217;
+    var SASL_IR                    = 218;
+    var XFERINFOFUNCTION           = 219;
+    var XOAUTH2_BEARER             = 220;
+    var DNS_INTERFACE              = 221;
+    var DNS_LOCAL_IP4              = 222;
+    var DNS_LOCAL_IP6              = 223;
+    var LOGIN_OPTIONS              = 224;
+    var SSL_ENABLE_NPN             = 225;
+    var SSL_ENABLE_ALPN            = 226;
+    var EXPECT_100_TIMEOUT_MS      = 227;
+    var PROXYHEADER                = 228;
+    var HEADEROPT                  = 229;
 }

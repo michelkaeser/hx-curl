@@ -5,7 +5,7 @@ package hxcurl.easy;
 #elseif neko
     import neko.Lib;
 #else
-    #error "Curl (and the whole hxcurl library) is only supported on C++ and Neko targets."
+    #error "easy.Curl (and the whole hxcurl library) is only supported on C++ and Neko targets."
 #end
 import hxcurl.CurlHandle;
 import hxcurl.CurlException;
@@ -32,7 +32,7 @@ class Curl extends hxcurl.Curl
 
 
     /**
-     * Constructor to initialize a new Curl instance.
+     *
      */
     public function new():Void
     {
@@ -40,6 +40,149 @@ class Curl extends hxcurl.Curl
 
         try {
             this.handle = Curl.hxcurl_easy_init();
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function cleanup():Void
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            Curl.hxcurl_easy_cleanup(this.handle);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function duplicate():Curl
+    {
+        var dup:Curl = new Curl();
+        try {
+            dup.handle = Curl.hxcurl_easy_duphandle(this.handle);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+
+        return dup;
+    }
+
+    /**
+     *
+     */
+    public function escape(str:String):String
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            return Curl.hxcurl_easy_escape(this.handle, str);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function pause(bitmask:Int):Void
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            Curl.hxcurl_easy_pause(this.handle, bitmask);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function perform():Void
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            Curl.hxcurl_easy_perform(this.handle);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function read(bytes:Int):String
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            return Curl.hxcurl_easy_recv(this.handle, bytes);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function reset():Void
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            Curl.hxcurl_easy_reset(this.handle);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function unescape(str:String):String
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            return Curl.hxcurl_easy_unescape(this.handle, str);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function write(msg:String):Int
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            return Curl.hxcurl_easy_send(this.handle, msg);
         } catch (ex:Dynamic) {
             throw new NativeCurlException(ex);
         }
