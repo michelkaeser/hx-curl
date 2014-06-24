@@ -15,7 +15,7 @@ extern "C"
     {
         val_check_kind(val, k_curl_struct);
 
-        struct S_CURL* curl = val_curl_struct(val);
+        SCURL* curl = val_curl_struct(val);
         if (curl->cleanup) {
             finalize_curl_handle(curl->handle);
             curl->cleanup = false;
@@ -32,13 +32,13 @@ extern "C"
         val_check_kind(val, k_curl_struct);
 
         value dval;
-        struct S_CURL* curl = val_curl_struct(val);
+        SCURL* curl = val_curl_struct(val);
         CURL* dhandle = curl_easy_duphandle(curl->handle);
         if (dhandle == NULL) {
             neko_error();
             dval = alloc_null();
         } else {
-            struct S_CURL* dup = malloc_curl_struct();
+            S_CURL* dup = malloc_curl_struct();
             dup->cleanup = curl->cleanup;
             dup->handle  = dhandle;
             dval = alloc_curl_struct(dup);
@@ -81,7 +81,7 @@ extern "C"
             neko_error();
             val = alloc_null();
         } else {
-            struct S_CURL* curl = malloc_curl_struct();
+            S_CURL* curl = malloc_curl_struct();
             curl->cleanup = true;
             curl->handle  = handle;
             val = alloc_curl_struct(curl);
@@ -144,7 +144,7 @@ extern "C"
     {
         val_check_kind(val, k_curl_struct);
 
-        struct S_CURL* curl = val_curl_struct(val);
+        SCURL* curl = val_curl_struct(val);
         curl_easy_reset(curl->handle);
         curl->cleanup = true;
 
@@ -172,18 +172,28 @@ extern "C"
 
     // http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
     // TODO: define val type
-    // static value hxcurl_easy_setopt(value handle, value opt, value val)
-    // {
-    //     val_check_kind(handle, k_curl_handle);
-    //     val_check(opt, int);
+    static value hxcurl_easy_setopt(value curl, value curlopt, value optval)
+    {
+        val_check_kind(curl, k_curl_struct);
+        val_check(curlopt, int);
 
-    //     CURLcode ret = curl_easy_setopt(val_curl(handle), val_int(opt), val);
-    //     if (ret != 0) {
-    //         curl_error(ret);
-    //     }
+        CURLcode ret;
+        if (val_is_number(optval)) {
+            ret = curl_easy_setopt((val_curl_struct(curl))->handle, (CURLoption)val_int(curlopt), val_number(optval));
+        } else if (val_is_string(optval)) {
+            // char* str = (char*)malloc(val_strlen(optval) + 1);
+            // strcpy(str, val_string(optval));
+            // str[val_strlen(optval)] = '\0';
+            ret = curl_easy_setopt((val_curl_struct(curl))->handle, (CURLoption)val_int(curlopt), val_string(optval));
+            // free(str);
+        }
 
-    //     return alloc_null();
-    // }
+        if (ret != 0) {
+            curl_easy_error(ret);
+        }
+
+        return alloc_null();
+    }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_unescape.html
     static value hxcurl_easy_unescape(value curl, value str)
@@ -215,5 +225,5 @@ DEFINE_PRIM(hxcurl_easy_perform, 1);
 DEFINE_PRIM(hxcurl_easy_recv, 2);
 DEFINE_PRIM(hxcurl_easy_reset, 1);
 DEFINE_PRIM(hxcurl_easy_send, 2);
-// DEFINE_PRIM(hxcurl_easy_setopt, 3);
+DEFINE_PRIM(hxcurl_easy_setopt, 3);
 DEFINE_PRIM(hxcurl_easy_unescape, 2);

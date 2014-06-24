@@ -9,6 +9,9 @@ package hxcurl.easy;
 #end
 import hxcurl.CurlHandle;
 import hxcurl.CurlException;
+import hxcurl.CurlInfo;
+import hxcurl.CurlOpt;
+import hxcurl.CurlPause;
 import hxcurl.NativeCurlException;
 
 /**
@@ -28,6 +31,7 @@ class Curl extends hxcurl.Curl
     private static var hxcurl_easy_recv:CurlHandle->Int->String        = Lib.load("libcurl", "hxcurl_easy_recv", 2);
     private static var hxcurl_easy_reset:CurlHandle->Void              = Lib.load("libcurl", "hxcurl_easy_reset", 1);
     private static var hxcurl_easy_send:CurlHandle->String->Int        = Lib.load("libcurl", "hxcurl_easy_send", 2);
+    private static var hxcurl_easy_setopt:CurlHandle->Int->Dynamic->Void = Lib.load("libcurl", "hxcurl_easy_setopt", 3);
     private static var hxcurl_easy_unescape:CurlHandle->String->String = Lib.load("libcurl", "hxcurl_easy_unescape", 2);
 
 
@@ -95,7 +99,7 @@ class Curl extends hxcurl.Curl
     /**
      *
      */
-    public function pause(bitmask:Int):Void
+    public function pause(bitmask:CurlPause):Void
     {
         if (this.handle == null) {
             throw new CurlException();
@@ -151,6 +155,22 @@ class Curl extends hxcurl.Curl
 
         try {
             Curl.hxcurl_easy_reset(this.handle);
+        } catch (ex:Dynamic) {
+            throw new NativeCurlException(ex);
+        }
+    }
+
+    /**
+     *
+     */
+    public function setOption(option:CurlOpt, value:Dynamic):Void
+    {
+        if (this.handle == null) {
+            throw new CurlException();
+        }
+
+        try {
+            Curl.hxcurl_easy_setopt(this.handle, option, value);
         } catch (ex:Dynamic) {
             throw new NativeCurlException(ex);
         }
