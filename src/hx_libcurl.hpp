@@ -25,7 +25,7 @@ extern "C" {
 
 
     // Helper function to allocate an error buffer to be set with setopt
-    inline char* malloc_curl_errbuf()
+    inline char* malloc_curl_errbuf(void)
     {
         char* errbuf = (char*)malloc(sizeof(char) * (CURL_ERROR_SIZE + 1));
         errbuf[CURL_ERROR_SIZE] = '\0';

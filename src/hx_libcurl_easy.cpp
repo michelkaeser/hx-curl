@@ -2,6 +2,17 @@
 
 extern "C"
 {
+    __attribute__((constructor)) void init(void)
+    {
+        curl_global_init(CURL_GLOBAL_DEFAULT);
+    }
+
+    __attribute__((destructor)) void fini(void)
+    {
+        curl_global_cleanup();
+    }
+
+
     // GC finalizer to free 'CURL*' called by finalize_curl_struct
     void finalize_curl_handle(CURL* curl)
     {
@@ -82,12 +93,13 @@ extern "C"
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_getinfo.html
+    // TODO
     // static value hxcurl_easy_getinfo(...)
     // {
     // }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_init.html
-    static value hxcurl_easy_init()
+    static value hxcurl_easy_init(void)
     {
         value val;
         CURL* handle = curl_easy_init();
@@ -123,6 +135,7 @@ extern "C"
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_perform.html
+    // TODO: what to do when we need read_callback?
     static value hxcurl_easy_perform(value curl)
     {
         val_check_kind(curl, k_curl_struct);
@@ -205,6 +218,7 @@ extern "C"
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
+    // TODO: function callbacks, structs + objects other than string
     static value hxcurl_easy_setopt(value curl, value curlopt, value optval)
     {
         val_check_kind(curl, k_curl_struct);
