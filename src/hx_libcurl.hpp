@@ -65,24 +65,7 @@ extern "C" {
     //####################################################
     inline value curl_certinfo_to_val(struct curl_certinfo* info)
     {
-        value val = alloc_null();
-        if (info == NULL) {
-            val = alloc_null();
-        } else {
-            int length = info->num_of_certs;
-            val = alloc_array(length);
-            for (int i = 0; i < length; ++length) {
-                struct curl_slist* slist;
-                buffer buf = alloc_buffer(NULL);
-                for (slist = info->certinfo[i]; slist; slist = slist->next) {
-                    buffer_append(buf, slist->data);
-                    buffer_append(buf, "\\.\\");
-                }
-                val_array_set_i(val, i, buffer_to_string(buf));
-            }
-        }
-
-        return val;
+        return alloc_null();
     }
 
     inline value curl_slist_to_val(struct curl_slist* slist)
@@ -91,13 +74,16 @@ extern "C" {
         if (slist == NULL) {
             val = alloc_null();
         } else {
+            val = alloc_array(2);
+            val_array_set_i(val, 0, alloc_int(1));
+
             buffer buf = alloc_buffer(NULL);
             while (slist->next != NULL) {
                 buffer_append(buf, slist->data);
-                buffer_append(buf, "\\.\\");
+                buffer_append(buf, "_-_");
             }
 
-            val = buffer_to_string(buf);
+            val_array_set_i(val, 1, buffer_to_string(buf));
         }
 
         return val;
@@ -105,11 +91,7 @@ extern "C" {
 
     inline value curl_tlsinfo_to_val(struct curl_tlsinfo* tlsinfo)
     {
-        if (tlsinfo == NULL) {
-            return alloc_null();
-        } else {
-            return alloc_null();
-        }
+        return alloc_null();
     }
 
     // Helper function to allocate an error buffer to be set with setopt

@@ -14,6 +14,9 @@ import hxcurl.CurlOpt;
 import hxcurl.CurlPause;
 import hxcurl.NativeCurlException;
 
+using hxcurl.CurlTools;
+using StringTools;
+
 /**
  *
  */
@@ -106,27 +109,17 @@ class Curl extends hxcurl.Curl
             throw new CurlException();
         }
 
-        // TODO: switch didn't work (Capture variables must be lower-case)
-        var infoType = if (info == EFFECTIVE_URL || info == REDIRECT_URL || info == CONTENT_TYPE
-          || info == PRIVATE || info == PRIMARY_IP || info == LOCAL_IP || info == FTP_ENTRY_PATH || info == RTSP_SESSION_ID) {
-            0; // char*
-        } else if (info == TOTAL_TIME || info == NAMELOOKUP_TIME || info == CONNECT_TIME || info == APPCONNECT_TIME
-          || info == PRETRANSFER_TIME || info == STARTTRANSFER_TIME || info == REDIRECT_TIME || info == SIZE_UPLOAD
-          || info == SIZE_DOWNLOAD || info == SPEED_DOWNLOAD || info == SPEED_UPLOAD || info == CONTENT_LENGTH_DOWNLOAD
-          || info == CONTENT_LENGTH_UPLOAD) {
-            1; // double*
-        } else if (info == SSL_ENGINES || info == COOKIELIST) {
-            5; // struct curl_slist*
-        } else if (info == CERTINFO) {
-            6; // struct curl_certinfo*
-        } else if (info == TLS_SESSION) {
-            7; // struct curl_tlsinfo*
-        } else {
-            2; // long*
-        }
-
         try {
-            return Curl.hxcurl_easy_getinfo(this.handle, info, infoType);
+            var ret:Dynamic = Curl.hxcurl_easy_getinfo(this.handle, info, info.returnType());
+            if (Std.is(ret, Array)) {
+                var type:CurlStruct = ret[0];
+                ret = switch (type) {
+                    case SLIST: ret[1].split("_-_");
+                    default:    ret[1];
+                }
+            }
+
+            return ret;
         } catch (ex:Dynamic) {
             throw new NativeCurlException(ex);
         }

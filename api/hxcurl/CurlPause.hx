@@ -9,11 +9,10 @@ package hxcurl;
 @:enum
 abstract CurlPause(Int) to Int
 {
-    // Information
-    var CONT      = 0; // CurlPauseOffset.RECV_CONT | CurlPauseOffset.SEND_CONT;
-    var RECV      = 1; // 1 << 0;
-    var SEND      = 4; // 1 << 2;
-    var ALL       = 5; // CurlPause.RECV | CurlPause.SEND;
+    var CONT = 0; // CurlPauseOffset.RECV_CONT | CurlPauseOffset.SEND_CONT;
+    var RECV = 1; // 1 << 0;
+    var SEND = 4; // 1 << 2;
+    var ALL  = 5; // CurlPause.RECV | CurlPause.SEND;
 }
 
 
