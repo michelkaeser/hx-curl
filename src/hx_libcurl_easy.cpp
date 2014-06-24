@@ -2,11 +2,24 @@
 
 extern "C"
 {
+    // GC finalizer to free 'CURL*' called by finalize_curl_struct
     void finalize_curl_handle(CURL* curl)
     {
         if (curl != NULL) {
             curl_easy_cleanup(curl);
         }
+    }
+
+    // Write callback function for curl_easy_perform set through setopt
+    static size_t write_callback(char* str, size_t size, size_t nmemb, void* userdata)
+    {
+        buffer buf = (buffer)userdata;
+        const size_t realsize = size * nmemb;
+        if (realsize > 0) {
+            buffer_append_sub(buf, str, realsize);
+        }
+
+        return realsize;
     }
 
 
@@ -17,7 +30,7 @@ extern "C"
 
         SCURL* curl = val_curl_struct(val);
         if (curl->cleanup) {
-            finalize_curl_handle(curl->handle);
+            curl_easy_cleanup(curl->handle);
             curl->cleanup = false;
         } else {
             neko_error();
@@ -38,8 +51,9 @@ extern "C"
             neko_error();
             dval = alloc_null();
         } else {
-            S_CURL* dup = malloc_curl_struct();
+            S_CURL* dup  = malloc_curl_struct();
             dup->cleanup = curl->cleanup;
+            dup->errbuf  = malloc_curl_errbuf();
             dup->handle  = dhandle;
             dval = alloc_curl_struct(dup);
             val_gc(dval, finalize_curl_struct);
@@ -81,9 +95,12 @@ extern "C"
             neko_error();
             val = alloc_null();
         } else {
-            S_CURL* curl = malloc_curl_struct();
+            S_CURL* curl  = malloc_curl_struct();
             curl->cleanup = true;
+            curl->errbuf  = malloc_curl_errbuf();
             curl->handle  = handle;
+
+            curl_easy_setopt(curl->handle, CURLOPT_ERRORBUFFER, curl->errbuf);
             val = alloc_curl_struct(curl);
             val_gc(val, finalize_curl_struct);
         }
@@ -110,12 +127,29 @@ extern "C"
     {
         val_check_kind(curl, k_curl_struct);
 
-        CURLcode ret = curl_easy_perform((val_curl_struct(curl))->handle);
+        SCURL* scurl = val_curl_struct(curl);
+        buffer buf   = alloc_buffer(NULL);
+        value val    = alloc_null();
+        CURLcode ret;
+
+        ret = curl_easy_setopt(scurl->handle, CURLOPT_WRITEDATA, buf);
         if (ret != 0) {
             curl_easy_error(ret);
+        } else {
+            ret = curl_easy_setopt(scurl->handle, CURLOPT_WRITEFUNCTION, write_callback);
+            if (ret != 0) {
+                curl_easy_error(ret);
+            } else {
+                ret = curl_easy_perform(scurl->handle);
+                if (ret != 0) {
+                    curl_easy_error(ret);
+                } else {
+                    val = buffer_to_string(buf);
+                }
+            }
         }
 
-        return alloc_null();
+        return val;
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_recv.html
@@ -171,21 +205,19 @@ extern "C"
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
-    // TODO: define val type
     static value hxcurl_easy_setopt(value curl, value curlopt, value optval)
     {
         val_check_kind(curl, k_curl_struct);
         val_check(curlopt, int);
 
+        SCURL* scurl = val_curl_struct(curl);
         CURLcode ret;
         if (val_is_number(optval)) {
-            ret = curl_easy_setopt((val_curl_struct(curl))->handle, (CURLoption)val_int(curlopt), val_number(optval));
+            ret = curl_easy_setopt(scurl->handle, (CURLoption)val_int(curlopt), val_number(optval));
         } else if (val_is_string(optval)) {
-            // char* str = (char*)malloc(val_strlen(optval) + 1);
-            // strcpy(str, val_string(optval));
-            // str[val_strlen(optval)] = '\0';
-            ret = curl_easy_setopt((val_curl_struct(curl))->handle, (CURLoption)val_int(curlopt), val_string(optval));
-            // free(str);
+            ret = curl_easy_setopt(scurl->handle, (CURLoption)val_int(curlopt), val_string(optval));
+        } else if (val_is_object(optval)) {
+            ret = curl_easy_setopt(scurl->handle, (CURLoption)val_int(curlopt), val_data(optval));
         }
 
         if (ret != 0) {
