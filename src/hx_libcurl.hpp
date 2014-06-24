@@ -63,41 +63,42 @@ extern "C" {
     //####################################################
     // HELPER FUNCTIONS
     //####################################################
-    // TODO
     inline value curl_certinfo_to_val(struct curl_certinfo* info)
     {
         value val = alloc_null();
-        // if (info == NULL) {
-        //     val = alloc_null();
-        // } else {
-        //     int length = info->num_of_certs;
-        //     val = alloc_array(length);
-        //     for (int i = 0; i < length; ++length) {
-        //         struct curl_slist* slist;
-        //         for (slist = info->certinfo[i]; slist; slist = slist->next) {
-        //             val_array_set_i(val, i, alloc_string(slist->data));
-        //         }
-        //     }
-        // }
+        if (info == NULL) {
+            val = alloc_null();
+        } else {
+            int length = info->num_of_certs;
+            val = alloc_array(length);
+            for (int i = 0; i < length; ++length) {
+                struct curl_slist* slist;
+                buffer buf = alloc_buffer(NULL);
+                for (slist = info->certinfo[i]; slist; slist = slist->next) {
+                    buffer_append(buf, slist->data);
+                    buffer_append(buf, "\\.\\");
+                }
+                val_array_set_i(val, i, buffer_to_string(buf));
+            }
+        }
 
         return val;
     }
 
-    // TODO
     inline value curl_slist_to_val(struct curl_slist* slist)
     {
-        value val = alloc_null();
-        // if (slist == NULL) {
-        //     val = alloc_null();
-        // } else {
-        //     buffer buf = alloc_buffer(NULL);
-        //     while (slist->next != NULL) {
-        //         buffer_append(buf, slist->data);
-        //         buffer_append(buf, "\\.\\");
-        //     }
-        //
-        //     val = buffer_to_string(buf);
-        // }
+        value val;
+        if (slist == NULL) {
+            val = alloc_null();
+        } else {
+            buffer buf = alloc_buffer(NULL);
+            while (slist->next != NULL) {
+                buffer_append(buf, slist->data);
+                buffer_append(buf, "\\.\\");
+            }
+
+            val = buffer_to_string(buf);
+        }
 
         return val;
     }

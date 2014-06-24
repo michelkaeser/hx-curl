@@ -117,33 +117,33 @@ extern "C"
         UInfoTypes ptr;
         switch (val_int(type)) {
             case 0: {
-                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.c));
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &ptr.c);
                 val = alloc_string(ptr.c);
                 break;
             }
             case 1: {
-                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.d));
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &ptr.d);
                 val = alloc_float(ptr.d);
                 break;
             }
             case 2: {
-                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.l));
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &ptr.l);
                 val = alloc_float(ptr.l);
                 break;
             }
             case 5: {
-                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.slist));
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &ptr.slist);
                 val = curl_slist_to_val(ptr.slist);
                 curl_slist_free_all(ptr.slist);
                 break;
             }
             case 6: {
-                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.certinfo));
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &ptr.certinfo);
                 val = curl_certinfo_to_val(ptr.certinfo);
                 break;
             }
             case 7: {
-                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.tlsinfo));
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &ptr.tlsinfo);
                 val = curl_tlsinfo_to_val(ptr.tlsinfo);
                 break;
             }
