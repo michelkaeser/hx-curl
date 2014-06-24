@@ -2,6 +2,9 @@
 
 extern "C"
 {
+    //####################################################
+    // INITIALIZERS / FINALIZERS
+    //####################################################
     __attribute__((constructor)) void init(void)
     {
         curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -13,14 +16,9 @@ extern "C"
     }
 
 
-    // GC finalizer to free 'CURL*' called by finalize_curl_struct
-    void finalize_curl_handle(CURL* curl)
-    {
-        if (curl != NULL) {
-            curl_easy_cleanup(curl);
-        }
-    }
-
+    //####################################################
+    // HELPER FUNCTIONS
+    //####################################################
     // Write callback function for curl_easy_perform set through setopt
     static size_t write_callback(char* str, size_t size, size_t nmemb, void* userdata)
     {
@@ -34,6 +32,21 @@ extern "C"
     }
 
 
+    //####################################################
+    // GC FUNCTIONS
+    //####################################################
+    // GC finalizer to free 'CURL*' called by finalize_curl_struct
+    void finalize_curl_handle(CURL* curl)
+    {
+        if (curl != NULL) {
+            curl_easy_cleanup(curl);
+        }
+    }
+
+
+    //####################################################
+    // C FFI IMPLEMENTATIONS
+    //####################################################
     // http://curl.haxx.se/libcurl/c/curl_easy_cleanup.html
     static value hxcurl_easy_cleanup(value val)
     {
@@ -93,10 +106,60 @@ extern "C"
     }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_getinfo.html
-    // TODO
-    // static value hxcurl_easy_getinfo(...)
-    // {
-    // }
+    static value hxcurl_easy_getinfo(value curl, value info, value type)
+    {
+        val_check_kind(curl, k_curl_struct);
+        val_check(info, int);
+        val_check(type, int);
+
+        value val;
+        CURLcode ret;
+        UInfoTypes ptr;
+        switch (val_int(type)) {
+            case 0: {
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.c));
+                val = alloc_string(ptr.c);
+                break;
+            }
+            case 1: {
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.d));
+                val = alloc_float(ptr.d);
+                break;
+            }
+            case 2: {
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.l));
+                val = alloc_float(ptr.l);
+                break;
+            }
+            case 5: {
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.slist));
+                val = curl_slist_to_val(ptr.slist);
+                curl_slist_free_all(ptr.slist);
+                break;
+            }
+            case 6: {
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.certinfo));
+                val = curl_certinfo_to_val(ptr.certinfo);
+                break;
+            }
+            case 7: {
+                ret = curl_easy_getinfo((val_curl_struct(curl))->handle, (CURLINFO)val_int(info), &(ptr.tlsinfo));
+                val = curl_tlsinfo_to_val(ptr.tlsinfo);
+                break;
+            }
+            default: {
+                neko_error();
+                val = alloc_null();
+            }
+        }
+
+        if (ret != CURLE_OK) {
+            curl_easy_error(ret);
+            val = alloc_null();
+        }
+
+        return val;
+    }
 
     // http://curl.haxx.se/libcurl/c/curl_easy_init.html
     static value hxcurl_easy_init(void)
@@ -127,7 +190,7 @@ extern "C"
         val_check(bitmask, int);
 
         CURLcode ret = curl_easy_pause((val_curl_struct(curl))->handle, val_int(bitmask));
-        if (ret != 0) {
+        if (ret != CURLE_OK) {
             curl_easy_error(ret);
         }
 
@@ -146,15 +209,15 @@ extern "C"
         CURLcode ret;
 
         ret = curl_easy_setopt(scurl->handle, CURLOPT_WRITEDATA, buf);
-        if (ret != 0) {
+        if (ret != CURLE_OK) {
             curl_easy_error(ret);
         } else {
             ret = curl_easy_setopt(scurl->handle, CURLOPT_WRITEFUNCTION, write_callback);
-            if (ret != 0) {
+            if (ret != CURLE_OK) {
                 curl_easy_error(ret);
             } else {
                 ret = curl_easy_perform(scurl->handle);
-                if (ret != 0) {
+                if (ret != CURLE_OK) {
                     curl_easy_error(ret);
                 } else {
                     val = buffer_to_string(buf);
@@ -176,7 +239,7 @@ extern "C"
         size_t received;
         char buffer[buflen];
         CURLcode ret = curl_easy_recv((val_curl_struct(curl))->handle, &buffer, buflen, &received);
-        if (ret != 0) {
+        if (ret != CURLE_OK) {
             curl_easy_error(ret);
         } else {
             val = alloc_string(buffer);
@@ -207,7 +270,7 @@ extern "C"
         value val;
         size_t sent;
         CURLcode ret = curl_easy_send((val_curl_struct(curl))->handle, val_string(msg), val_strlen(msg), &sent);
-        if (ret != 0) {
+        if (ret != CURLE_OK) {
             curl_easy_error(ret);
             val = alloc_null();
         } else {
@@ -232,9 +295,11 @@ extern "C"
             ret = curl_easy_setopt(scurl->handle, (CURLoption)val_int(curlopt), val_string(optval));
         } else if (val_is_object(optval)) {
             ret = curl_easy_setopt(scurl->handle, (CURLoption)val_int(curlopt), val_data(optval));
+        } else {
+            neko_error(); // function, not yet implemented
         }
 
-        if (ret != 0) {
+        if (ret != CURLE_OK) {
             curl_easy_error(ret);
         }
 
@@ -263,7 +328,7 @@ extern "C"
 
 DEFINE_PRIM(hxcurl_easy_cleanup, 1);
 DEFINE_PRIM(hxcurl_easy_duphandle, 1);
-// DEFINE_PRIM(hxcurl_easy_getinfo, X);
+DEFINE_PRIM(hxcurl_easy_getinfo, 3);
 DEFINE_PRIM(hxcurl_easy_escape, 2);
 DEFINE_PRIM(hxcurl_easy_init, 0);
 DEFINE_PRIM(hxcurl_easy_pause, 2);

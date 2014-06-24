@@ -7,7 +7,7 @@ package hxcurl;
  * @link https://github.com/bagder/curl/blob/ade380a7aa1241fd7a2e16ee0c44fe268b42ff9a/include/curl/curl.h#L2039-L2094
  */
 @:enum
-abstract CurlInfo(Int) from Int to Int
+abstract CurlInfo(Int) to Int
 {
     // Information
     var EFFECTIVE_URL           = (cast CurlInfoOffset.STRING) + 1;

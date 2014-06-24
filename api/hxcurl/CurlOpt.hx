@@ -7,7 +7,7 @@ package hxcurl;
  * @link https://github.com/bagder/curl/blob/ade380a7aa1241fd7a2e16ee0c44fe268b42ff9a/include/curl/curl.h
  */
 @:enum
-abstract CurlOpt(Int) from Int to Int
+abstract CurlOpt(Int) to Int
 {
     var WRITEDATA                  = (cast CurlOptOffset.OBJECTPOINT)   + 1;
     var URL                        = (cast CurlOptOffset.OBJECTPOINT)   + 2;
@@ -56,7 +56,7 @@ abstract CurlOpt(Int) from Int to Int
     var NETRC                      = (cast CurlOptOffset.LONG)          + 51;
     var FOLLOWLOCATION             = (cast CurlOptOffset.LONG)          + 52;
     var TRANSFERTEXT               = (cast CurlOptOffset.LONG)          + 53;
-    var PUT                        = (cast CurlOptOffset.LONG)          +54;
+    var PUT                        = (cast CurlOptOffset.LONG)          + 54;
     var PROGRESSFUNCTION           = (cast CurlOptOffset.FUNCTIONPOINT) + 56;
     var PROGRESSDATA               = (cast CurlOptOffset.OBJECTPOINT)   + 57;
     var XFERINFODATA               = CurlOpt.PROGRESSDATA;

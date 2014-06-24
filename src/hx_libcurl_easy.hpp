@@ -11,7 +11,7 @@ extern "C" {
     static value hxcurl_easy_cleanup(value);
     static value hxcurl_easy_duphandle(value);
     static value hxcurl_easy_escape(value, value);
-    // static value hxcurl_easy_getinfo(...);
+    static value hxcurl_easy_getinfo(value, value, value);
     static value hxcurl_easy_init();
     static value hxcurl_easy_pause(value, value);
     static value hxcurl_easy_perform(value);

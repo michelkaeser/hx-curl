@@ -7,7 +7,7 @@ package hxcurl;
  * @link https://github.com/bagder/curl/blob/ade380a7aa1241fd7a2e16ee0c44fe268b42ff9a/include/curl/curl.h#L2288-L2297
  */
 @:enum
-abstract CurlPause(Int) from Int to Int
+abstract CurlPause(Int) to Int
 {
     // Information
     var CONT      = 0; // CurlPauseOffset.RECV_CONT | CurlPauseOffset.SEND_CONT;
