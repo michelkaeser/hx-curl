@@ -10,9 +10,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    //####################################################
-    // KIND DEFINITIONS
-    //####################################################
     DEFINE_KIND(k_curl_struct);
     // CURL(INFO) structs
     DEFINE_KIND(k_curl_certinfo);
@@ -20,9 +17,6 @@ extern "C" {
     DEFINE_KIND(k_curl_tlsinfo);
 
 
-    //####################################################
-    // TYPEDEFS
-    //####################################################
     // typedef for the struct we bring up to C++/Neko
     /*extern */ typedef struct S_CURL {
         bool  cleanup;
@@ -41,9 +35,6 @@ extern "C" {
     } UInfoTypes;
 
 
-    //####################################################
-    // HELPER MACROS
-    //####################################################
     #define alloc_curl_struct(v)     alloc_abstract(k_curl_struct, v)
     #define malloc_curl_struct()     (SCURL*)malloc(sizeof(SCURL))
     #define val_curl_struct(v)       (SCURL*)val_data(v)
@@ -60,9 +51,6 @@ extern "C" {
     #define val_is_curl_tlsinfo(v)   val_is_kind(v, k_curl_tlsinfo)
 
 
-    //####################################################
-    // HELPER FUNCTIONS
-    //####################################################
     inline value curl_certinfo_to_val(struct curl_certinfo* info)
     {
         return alloc_null();
@@ -104,9 +92,6 @@ extern "C" {
     }
 
 
-    //####################################################
-    // GC FUNCTIONS
-    //####################################################
     // GC finalizer to free 'CURL*' called by finalize_curl_struct
     extern void finalize_curl_handle(CURL*);
     // GC finalizer to free 'S_CURL' called when a 'k_curl_struct' gets garbage collected

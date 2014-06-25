@@ -2,9 +2,6 @@
 
 extern "C"
 {
-    //####################################################
-    // INITIALIZERS / FINALIZERS
-    //####################################################
     __attribute__((constructor)) void init(void)
     {
         curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -16,9 +13,6 @@ extern "C"
     }
 
 
-    //####################################################
-    // HELPER FUNCTIONS
-    //####################################################
     // Write callback function for curl_easy_perform set through setopt
     static size_t write_callback(char* str, size_t size, size_t nmemb, void* userdata)
     {
@@ -32,9 +26,6 @@ extern "C"
     }
 
 
-    //####################################################
-    // GC FUNCTIONS
-    //####################################################
     // GC finalizer to free 'CURL*' called by finalize_curl_struct
     void finalize_curl_handle(CURL* curl)
     {
@@ -44,9 +35,6 @@ extern "C"
     }
 
 
-    //####################################################
-    // C FFI IMPLEMENTATIONS
-    //####################################################
     // http://curl.haxx.se/libcurl/c/curl_easy_cleanup.html
     static value hxcurl_easy_cleanup(value val)
     {
