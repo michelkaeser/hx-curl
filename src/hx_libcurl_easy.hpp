@@ -87,7 +87,7 @@ value hxcurl_easy_escape(value curl, value str);
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_getinfo.html
  */
-value hxcurl_easy_getinfo_string(value curl, value info);
+value hxcurl_easy_getinfo(value curl, value info, value type);
 
 /*
  *

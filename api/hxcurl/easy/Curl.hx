@@ -17,7 +17,6 @@ import hxcurl.easy.CurlPause;
 import hxstd.IllegalArgumentException;
 import hxstd.IllegalStateException;
 
-using hxcurl.CurlTools;
 using StringTools;
 
 /**
@@ -31,7 +30,7 @@ class Curl extends hxcurl.Curl
     private static var hxcurl_easy_cleanup:CurlHandle->Void           = Lib.load("libcurl", "hxcurl_easy_cleanup", 1);
     private static var hxcurl_easy_duphandle:CurlHandle->CurlHandle   = Lib.load("libcurl", "hxcurl_easy_duphandle", 1);
     private static var hxcurl_easy_escape:CurlHandle->String->String  = Lib.load("libcurl", "hxcurl_easy_escape", 2);
-    /*private static var hxcurl_easy_getinfo_string:CurlHandle->CurlInfo->String = Lib.load("libcurl", "hxcurl_easy_getinfo_string", 2);*/
+    private static var hxcurl_easy_getinfo:CurlHandle->CurlInfo->Int->Dynamic = Lib.load("libcurl", "hxcurl_easy_getinfo", 3);
     private static var hxcurl_easy_init:Void->CurlHandle              = Lib.load("libcurl", "hxcurl_easy_init", 0);
     private static var hxcurl_easy_pause:CurlHandle->CurlPause->Void  = Lib.load("libcurl", "hxcurl_easy_pause", 2);
     private static var hxcurl_easy_perform:CurlHandle->BytesData      = Lib.load("libcurl", "hxcurl_easy_perform", 1);
@@ -106,23 +105,18 @@ class Curl extends hxcurl.Curl
     /**
      *
      */
-    /*public function getInfo(info:CurlInfo):Dynamic
+    public function getInfo(info:CurlInfo):Dynamic
     {
         if (this.handle == null) {
             throw new IllegalStateException();
         }
 
         try {
-            var ret:Dynamic = switch(info.returnType()) {
-                case 0:  Curl.hxcurl_easy_getinfo_string(this.handle, info);
-                default: null;
-            }
-
-            return ret;
+            return Curl.hxcurl_easy_getinfo(this.handle, info, CurlInfo.returnType(info));
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
-    }*/
+    }
 
     /**
      *

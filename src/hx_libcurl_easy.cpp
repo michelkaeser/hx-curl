@@ -8,6 +8,10 @@
 
 extern "C" {
 
+static value hxcurl_easy_getinfo_double(value, value);
+static value hxcurl_easy_getinfo_long(value, value);
+static value hxcurl_easy_getinfo_string(value, value);
+
 // http://curl.haxx.se/libcurl/c/CURLOPT_DEBUGFUNCTION.html
 static int debug_callback(CURL*, curl_infotype, char*, size_t, void*);
 // http://curl.haxx.se/libcurl/c/CURLOPT_HEADERFUNCTION.html
@@ -189,24 +193,81 @@ value hxcurl_easy_escape(value curl, value str)
 DEFINE_PRIM(hxcurl_easy_escape, 2);
 
 
-// value hxcurl_easy_getinfo_string(value curl, value info)
-// {
-//     val_check_kind(curl, k_easy_curl);
-//     val_check(info, int);
+value hxcurl_easy_getinfo(value curl, value info, value type)
+{
+    val_check_kind(curl, k_easy_curl);
+    val_check(info, int);
+    val_check(type, int);
 
-//     value val;
-//     char* info_val;
-//     CURLcode ret = curl_easy_getinfo(val_easy_handle(curl), (CURLINFO)val_int(info), &info_val);
-//     if (ret == CURLE_OK) {
-//         val = alloc_string(info_val);
-//     } else {
-//         curl_easy_error(ret);
-//         val = alloc_null();
-//     }
+    value val;
+    switch (val_int(type)) {
+        case 0: {
+            val = hxcurl_easy_getinfo_string(curl, info);
+            break;
+        }
+        case 1: {
+            val = hxcurl_easy_getinfo_double(curl, info);
+            break;
+        }
+        case 2: {
+            val = hxcurl_easy_getinfo_long(curl, info);
+            break;
+        }
+        default: {
+            // TODO: implement the three struct info types
+            neko_error();
+            val = alloc_null();
+        }
+    }
 
-//     return val;
-// }
-// DEFINE_PRIM(hxcurl_easy_getinfo_string, 2);
+    return val;
+}
+DEFINE_PRIM(hxcurl_easy_getinfo, 3);
+
+static value hxcurl_easy_getinfo_double(value curl, value info)
+{
+    value val;
+    double info_val;
+    CURLcode ret = curl_easy_getinfo(val_easy_handle(curl), (CURLINFO)val_int(info), &info_val);
+    if (ret == CURLE_OK) {
+        val = alloc_float(info_val);
+    } else {
+        curl_easy_error(ret);
+        val = alloc_null();
+    }
+
+    return val;
+}
+
+static value hxcurl_easy_getinfo_long(value curl, value info)
+{
+    value val;
+    long info_val;
+    CURLcode ret = curl_easy_getinfo(val_easy_handle(curl), (CURLINFO)val_int(info), &info_val);
+    if (ret == CURLE_OK) {
+        val = alloc_int(info_val);
+    } else {
+        curl_easy_error(ret);
+        val = alloc_null();
+    }
+
+    return val;
+}
+
+static value hxcurl_easy_getinfo_string(value curl, value info)
+{
+    value val;
+    char* info_val;
+    CURLcode ret = curl_easy_getinfo(val_easy_handle(curl), (CURLINFO)val_int(info), &info_val);
+    if (ret == CURLE_OK) {
+        val = alloc_string(info_val);
+    } else {
+        curl_easy_error(ret);
+        val = alloc_null();
+    }
+
+    return val;
+}
 
 
 value hxcurl_easy_init(void)
