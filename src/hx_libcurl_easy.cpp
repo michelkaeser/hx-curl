@@ -61,6 +61,7 @@ void finalize_easy_curl_abstract(value curl)
             ecurl->cleanup = (bool)NULL;
             curl_free(ecurl->errbuf);
             ecurl->errbuf = NULL;
+            // TODO: illegal hardware instruction or segmentation fault
             finalize_easy_curl_callbacks(ecurl->callbacks);
             ecurl->callbacks = NULL;
             ecurl->data = NULL;
@@ -151,10 +152,11 @@ value hxcurl_easy_duphandle(value curl)
         neko_error();
         dval = alloc_null();
     } else {
-        // TODO: illegal hardware instruction or segmentation fault
-        ECURL* dup   = malloc_easy_curl();
+        ECURL* dup     = malloc_easy_curl();
+        dup->callbacks = malloc_easy_callbacks();
         memcpy(dup->callbacks, ecurl->callbacks, sizeof(ECALLBACKS));
         dup->cleanup = ecurl->cleanup;
+        dup->data    = malloc_easy_data();
         memcpy(dup->data, ecurl->data, sizeof(EDATA));
         dup->errbuf  = malloc_curl_errbuf();
         dup->handle  = dhandle;
@@ -362,7 +364,6 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
             break;
         }
         case CURLOPT_DEBUGFUNCTION: {
-            //val_check_function(optval, 1);
             root_set(&ecurl->callbacks->debug, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGFUNCTION, debug_callback);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGDATA, ecurl);
@@ -374,7 +375,6 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
             break;
         }
         case CURLOPT_HEADERFUNCTION: {
-            //val_check_function(optval, 1);
             root_set(&ecurl->callbacks->header, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERFUNCTION, header_callback);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERDATA, ecurl);
@@ -386,7 +386,6 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
             break;
         }
         case CURLOPT_PROGRESSFUNCTION: {
-            //val_check_function(optval, 4);
             root_set(&ecurl->callbacks->progress, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSFUNCTION, progress_callback);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSDATA, ecurl);
@@ -398,7 +397,6 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
             break;
         }
         case CURLOPT_READFUNCTION: {
-            //val_check_function(optval, 4);
             root_set(&ecurl->callbacks->progress, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_READFUNCTION, read_callback);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_READDATA, ecurl);
@@ -410,19 +408,26 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
             break;
         }
         case CURLOPT_WRITEFUNCTION: {
-            //val_check_function(optval, 4);
             root_set(&ecurl->callbacks->write, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEFUNCTION, write_callback);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEDATA, ecurl);
             break;
         }
         default: {
-            if (val_is_number(optval)) {
-                ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_number(optval));
-            } else if (val_is_string(optval)) {
-                ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_string(optval));
-            } else {
-                neko_error();
+            switch (val_type(optval)) {
+                case VAL_FLOAT: {
+                    ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_float(optval));
+                    break;
+                }
+                case VAL_INT: {
+                    ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_int(optval));
+                    break;
+                }
+                case VAL_STRING: {
+                    ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_string(optval));
+                    break;
+                }
+                default: { neko_error(); }
             }
         }
     }
