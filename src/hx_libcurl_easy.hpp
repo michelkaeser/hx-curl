@@ -26,12 +26,13 @@ DEFINE_KIND(k_easy_curl);
     AutoGCRoot* write;
 } ECALLBACKS;
 
+// TODO: see https://github.com/HaxeFoundation/neko/issues/33
 /* extern */ typedef struct S_EDATA {
-    void* debug;
-    void* header;
-    void* progress;
-    void* read;
-    void* write;
+    value debug;
+    value header;
+    value progress;
+    value read;
+    value write;
 } EDATA;
 
 /*extern */ typedef struct S_ECURL {
@@ -53,12 +54,6 @@ void finalize_easy_curl_abstract(value curl);
  *
  */
 void finalize_easy_curl_callbacks(ECALLBACKS* callbacks);
-
-
-/*
- *
- */
-void finalize_easy_curl_data(EDATA* data);
 
 
 /*
@@ -155,7 +150,7 @@ value hxcurl_easy_unescape(value curl, value str);
  */
 inline ECALLBACKS* malloc_easy_callbacks(void)
 {
-    ECALLBACKS callbacks   = { NULL, NULL, NULL, NULL, NULL};
+    const ECALLBACKS callbacks = { NULL, NULL, NULL, NULL, NULL};
     ECALLBACKS* mcallbacks = (ECALLBACKS*)malloc(sizeof(ECALLBACKS));
     memcpy(mcallbacks, &callbacks, sizeof(ECALLBACKS));
 
@@ -168,7 +163,7 @@ inline ECALLBACKS* malloc_easy_callbacks(void)
  */
 inline EDATA* malloc_easy_data(void)
 {
-    EDATA data   = { NULL, NULL, NULL, NULL, NULL};
+    const EDATA data = { NULL, NULL, NULL, NULL, NULL};
     EDATA* mdata = (EDATA*)malloc(sizeof(EDATA));
     memcpy(mdata, &data, sizeof(EDATA));
 

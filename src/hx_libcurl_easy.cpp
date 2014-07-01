@@ -18,6 +18,7 @@ static int progress_callback(void*, double, double, double, double);
 static size_t read_callback(char*, size_t, size_t, void*);
 // http://curl.haxx.se/libcurl/c/CURLOPT_WRITEFUNCTION.html
 static size_t write_callback(char*, size_t, size_t, void*);
+static size_t write_callback_default(char*, size_t, size_t, void*);
 
 
 __attribute__((constructor)) void init(void)
@@ -36,9 +37,15 @@ static int debug_callback(CURL* handle, curl_infotype type, char* data, size_t s
     ECURL* ecurl = (ECURL*)userptr;
     buffer buf = alloc_buffer(NULL);
     buffer_append_sub(buf, data, size);
-    val_call1(ecurl->callbacks->debug->get(), buffer_val(buf));
 
-    return 0;
+    value ret;
+    if (ecurl->data->debug == NULL) {
+        ret = val_call1(ecurl->callbacks->debug->get(), buffer_val(buf));
+    } else {
+        ret = val_call2(ecurl->callbacks->debug->get(), buffer_val(buf), ecurl->data->debug);
+    }
+
+    return val_int(ret);
 }
 
 
@@ -56,7 +63,6 @@ void finalize_easy_curl_abstract(value curl)
             ecurl->errbuf = NULL;
             finalize_easy_curl_callbacks(ecurl->callbacks);
             ecurl->callbacks = NULL;
-            finalize_easy_curl_data(ecurl->data);
             ecurl->data = NULL;
             free(ecurl);
             ecurl = NULL;
@@ -90,32 +96,6 @@ void finalize_easy_curl_callbacks(ECALLBACKS* callbacks)
     }
 }
 
-void finalize_easy_curl_data(EDATA* data)
-{
-    if (data != NULL) {
-        if (data->debug != NULL) {
-            free(data->debug);
-            data->debug = NULL;
-        }
-        if (data->header != NULL) {
-            free(data->header);
-            data->header = NULL;
-        }
-        if (data->progress != NULL) {
-            free(data->progress);
-            data->progress = NULL;
-        }
-        if (data->read != NULL) {
-            free(data->read);
-            data->read = NULL;
-        }
-        if (data->write != NULL) {
-            free(data->write);
-            data->write = NULL;
-        }
-    }
-}
-
 void finalize_easy_curl_handle(CURL* handle)
 {
     if (handle != NULL) {
@@ -130,9 +110,15 @@ static size_t header_callback(char* buf, size_t size, size_t nitems, void* userd
     ECURL* ecurl = (ECURL*)userdata;
     buffer b   = alloc_buffer(NULL);
     buffer_append_sub(b, buf, length);
-    val_call1(ecurl->callbacks->header->get(), buffer_val(b));
 
-    return length;
+    value ret;
+    if (ecurl->data->header == NULL) {
+        ret = val_call1(ecurl->callbacks->header->get(), buffer_val(b));
+    } else {
+        ret = val_call2(ecurl->callbacks->header->get(), buffer_val(b), ecurl->data->header);
+    }
+
+    return val_int(ret);
 }
 
 
@@ -143,7 +129,6 @@ value hxcurl_easy_cleanup(value curl)
     ECURL* ecurl = val_easy_curl(curl);
     if (ecurl->cleanup) {
         finalize_easy_curl_callbacks(ecurl->callbacks);
-        finalize_easy_curl_data(ecurl->data);
         finalize_easy_curl_handle(ecurl->handle);
         ecurl->cleanup = false;
     } else {
@@ -166,7 +151,7 @@ value hxcurl_easy_duphandle(value curl)
         neko_error();
         dval = alloc_null();
     } else {
-        // TODO: illegal hardware instruction  neko Debug.n
+        // TODO: illegal hardware instruction or segmentation fault
         ECURL* dup   = malloc_easy_curl();
         memcpy(dup->callbacks, ecurl->callbacks, sizeof(ECALLBACKS));
         dup->cleanup = ecurl->cleanup;
@@ -266,18 +251,25 @@ value hxcurl_easy_perform(value curl)
     val_check_kind(curl, k_easy_curl);
 
     value val;
-    CURLcode ret;
-    ECURL* ecurl = val_easy_curl(curl);
+    CURLcode ret = CURLE_OK;
     buffer buf   = alloc_buffer(NULL);
+    ECURL* ecurl = val_easy_curl(curl);
 
-    ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEDATA, buf);
-    if (ret == CURLE_OK) {
-        ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEFUNCTION, write_callback);
+    if (ecurl->callbacks->write == NULL) {
+        if (ecurl->data->write == NULL) {
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEDATA, buf);
+        } else {
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEDATA, /* TODO: ecurl->data->write */ buf);
+        }
         if (ret == CURLE_OK) {
-            ret = curl_easy_perform(ecurl->handle);
-            if (ret == CURLE_OK) {
-                val = buffer_val(buf);
-            }
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEFUNCTION, write_callback_default);
+        }
+    }
+
+    if (ret == CURLE_OK) {
+        ret = curl_easy_perform(ecurl->handle);
+        if (ret == CURLE_OK) {
+            val = buffer_val(buf);
         }
     }
 
@@ -363,51 +355,76 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
 
     ECURL* ecurl = val_easy_curl(curl);
     CURLcode ret;
-    if (val_is_number(optval)) {
-        ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_number(optval));
-    } else if (val_is_string(optval)) {
-        ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_string(optval));
-    } else if (val_is_function(optval)) {
-        switch (val_int(curlopt)) {
-            case CURLOPT_DEBUGFUNCTION: {
-                //val_check_function(optval, 1);
-                root_set(&ecurl->callbacks->debug, optval);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGFUNCTION, debug_callback);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGDATA, ecurl);
-                break;
-            }
-            case CURLOPT_HEADERFUNCTION: {
-                //val_check_function(optval, 1);
-                root_set(&ecurl->callbacks->header, optval);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERFUNCTION, header_callback);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERDATA, ecurl);
-                break;
-            }
-            case CURLOPT_PROGRESSFUNCTION: {
-                //val_check_function(optval, 4);
-                root_set(&ecurl->callbacks->progress, optval);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSFUNCTION, progress_callback);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSDATA, ecurl);
-                break;
-            }
-            case CURLOPT_READFUNCTION: {
-                //val_check_function(optval, 4);
-                root_set(&ecurl->callbacks->progress, optval);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_READFUNCTION, read_callback);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_READDATA, ecurl);
-                break;
-            }
-            case CURLOPT_WRITEFUNCTION: {
-                //val_check_function(optval, 4);
-                root_set(&ecurl->callbacks->progress, optval);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEFUNCTION, write_callback);
-                ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEDATA, ecurl);
-                break;
-            }
-            default: { neko_error(); }
+    switch (val_int(curlopt)) {
+        case CURLOPT_DEBUGDATA: {
+            ecurl->data->debug = optval;
+            ret = CURLE_OK;
+            break;
         }
-    } else {
-        neko_error(); // TODO: struct or object -> not yet implemented
+        case CURLOPT_DEBUGFUNCTION: {
+            //val_check_function(optval, 1);
+            root_set(&ecurl->callbacks->debug, optval);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGFUNCTION, debug_callback);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGDATA, ecurl);
+            break;
+        }
+        case CURLOPT_HEADERDATA: {
+            ecurl->data->header = optval;
+            ret = CURLE_OK;
+            break;
+        }
+        case CURLOPT_HEADERFUNCTION: {
+            //val_check_function(optval, 1);
+            root_set(&ecurl->callbacks->header, optval);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERFUNCTION, header_callback);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERDATA, ecurl);
+            break;
+        }
+        case CURLOPT_PROGRESSDATA: {
+            ecurl->data->progress = optval;
+            ret = CURLE_OK;
+            break;
+        }
+        case CURLOPT_PROGRESSFUNCTION: {
+            //val_check_function(optval, 4);
+            root_set(&ecurl->callbacks->progress, optval);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSFUNCTION, progress_callback);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSDATA, ecurl);
+            break;
+        }
+        case CURLOPT_READDATA: {
+            ecurl->data->read = optval;
+            ret = CURLE_OK;
+            break;
+        }
+        case CURLOPT_READFUNCTION: {
+            //val_check_function(optval, 4);
+            root_set(&ecurl->callbacks->progress, optval);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_READFUNCTION, read_callback);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_READDATA, ecurl);
+            break;
+        }
+        case CURLOPT_WRITEDATA: {
+            ecurl->data->write = optval;
+            ret = CURLE_OK;
+            break;
+        }
+        case CURLOPT_WRITEFUNCTION: {
+            //val_check_function(optval, 4);
+            root_set(&ecurl->callbacks->write, optval);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEFUNCTION, write_callback);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEDATA, ecurl);
+            break;
+        }
+        default: {
+            if (val_is_number(optval)) {
+                ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_number(optval));
+            } else if (val_is_string(optval)) {
+                ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_string(optval));
+            } else {
+                neko_error();
+            }
+        }
     }
 
     if (ret != CURLE_OK) {
@@ -442,18 +459,28 @@ DEFINE_PRIM(hxcurl_easy_unescape, 2);
 static int progress_callback(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow)
 {
     ECURL* ecurl = (ECURL*)clientp;
-    value arr    = alloc_array(4);
+
+    value arr;
+    if (ecurl->data->progress == NULL) {
+        arr = alloc_array(4);
+    } else {
+        arr = alloc_array(5);
+    }
     value* args  = val_array_value(arr);
+    args[0] = alloc_float(dltotal);
+    args[1] = alloc_float(dlnow);
+    args[2] = alloc_float(ultotal);
+    args[3] = alloc_float(ulnow);
 
-    // TODO: int64?
-    args[0] = alloc_int(dltotal);
-    args[1] = alloc_int(dlnow);
-    args[2] = alloc_int(ultotal);
-    args[3] = alloc_int(ulnow);
+    value ret;
+    if (ecurl->data->progress == NULL) {
+        ret = val_callN(ecurl->callbacks->progress->get(), args, 4);
+    } else {
+        args[4] = ecurl->data->progress;
+        ret = val_callN(ecurl->callbacks->progress->get(), args, 5);
+    }
 
-    val_callN(ecurl->callbacks->progress->get(), args, 4);
-
-    return 0;
+    return val_int(ret);
 }
 
 
@@ -467,11 +494,29 @@ static size_t read_callback(char* buffer, size_t size, size_t nitems, void* inst
 static size_t write_callback(char* str, size_t size, size_t nmemb, void* userdata)
 {
     const size_t length = size * nmemb;
-    // ECURL* ecurl = (ECURL*)userdata;
-    // buffer buf   = alloc_buffer(NULL);
-    // buffer_append_sub(buf, str, length);
-    // val_call1(ecurl->callbacks->write->get(), buffer_val(buf));
+    ECURL* ecurl = (ECURL*)userdata;
+    int written;
+    if (length > 0) {
+        value ret;
+        buffer buf = alloc_buffer(NULL);
+        buffer_append_sub(buf, str, length);
+        if (ecurl->data->write == NULL) {
+            ret = val_call1(ecurl->callbacks->write->get(), buffer_val(buf));
+        } else {
+            ret = val_call2(ecurl->callbacks->write->get(), buffer_val(buf), ecurl->data->write);
+        }
+        written = val_int(ret);
+    } else {
+        written = length;
+    }
 
+    return written;
+}
+
+
+static size_t write_callback_default(char* str, size_t size, size_t nmemb, void* userdata)
+{
+    const size_t length = size * nmemb;
     buffer buf = (buffer)userdata;
     if (length > 0) {
         buffer_append_sub(buf, str, length);
