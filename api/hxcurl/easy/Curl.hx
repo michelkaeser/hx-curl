@@ -7,12 +7,15 @@ package hxcurl.easy;
 #else
     #error "easy.Curl (and the whole hxcurl library) is only supported on C++ and Neko targets."
 #end
+import haxe.io.Bytes;
+import haxe.io.BytesData;
 import hxcurl.CurlHandle;
 import hxcurl.CurlException;
-import hxcurl.CurlInfo;
-import hxcurl.CurlOpt;
-import hxcurl.CurlPause;
-import hxcurl.NativeCurlException;
+import hxcurl.easy.CurlInfo;
+import hxcurl.easy.CurlOpt;
+import hxcurl.easy.CurlPause;
+import hxstd.IllegalArgumentException;
+import hxstd.IllegalStateException;
 
 using hxcurl.CurlTools;
 using StringTools;
@@ -28,13 +31,13 @@ class Curl extends hxcurl.Curl
     private static var hxcurl_easy_cleanup:CurlHandle->Void           = Lib.load("libcurl", "hxcurl_easy_cleanup", 1);
     private static var hxcurl_easy_duphandle:CurlHandle->CurlHandle   = Lib.load("libcurl", "hxcurl_easy_duphandle", 1);
     private static var hxcurl_easy_escape:CurlHandle->String->String  = Lib.load("libcurl", "hxcurl_easy_escape", 2);
-    private static var hxcurl_easy_getinfo:CurlHandle->CurlInfo->Int->Dynamic = Lib.load("libcurl", "hxcurl_easy_getinfo", 3);
+    /*private static var hxcurl_easy_getinfo_string:CurlHandle->CurlInfo->String = Lib.load("libcurl", "hxcurl_easy_getinfo_string", 2);*/
     private static var hxcurl_easy_init:Void->CurlHandle              = Lib.load("libcurl", "hxcurl_easy_init", 0);
     private static var hxcurl_easy_pause:CurlHandle->CurlPause->Void  = Lib.load("libcurl", "hxcurl_easy_pause", 2);
-    private static var hxcurl_easy_perform:CurlHandle->String         = Lib.load("libcurl", "hxcurl_easy_perform", 1);
-    private static var hxcurl_easy_recv:CurlHandle->Int->String       = Lib.load("libcurl", "hxcurl_easy_recv", 2);
+    private static var hxcurl_easy_perform:CurlHandle->BytesData      = Lib.load("libcurl", "hxcurl_easy_perform", 1);
+    private static var hxcurl_easy_recv:CurlHandle->Int->BytesData    = Lib.load("libcurl", "hxcurl_easy_recv", 2);
     private static var hxcurl_easy_reset:CurlHandle->Void             = Lib.load("libcurl", "hxcurl_easy_reset", 1);
-    private static var hxcurl_easy_send:CurlHandle->String->Int       = Lib.load("libcurl", "hxcurl_easy_send", 2);
+    private static var hxcurl_easy_send:CurlHandle->BytesData->Int->Int = Lib.load("libcurl", "hxcurl_easy_send", 3);
     private static var hxcurl_easy_setopt:CurlHandle->CurlOpt->Dynamic->Void = Lib.load("libcurl", "hxcurl_easy_setopt", 3);
     private static var hxcurl_easy_unescape:CurlHandle->String->String = Lib.load("libcurl", "hxcurl_easy_unescape", 2);
 
@@ -49,7 +52,7 @@ class Curl extends hxcurl.Curl
         try {
             this.handle = Curl.hxcurl_easy_init();
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
     }
 
@@ -59,13 +62,13 @@ class Curl extends hxcurl.Curl
     public function cleanup():Void
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
         try {
             Curl.hxcurl_easy_cleanup(this.handle);
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
     }
 
@@ -78,7 +81,7 @@ class Curl extends hxcurl.Curl
         try {
             dup.handle = Curl.hxcurl_easy_duphandle(this.handle);
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
 
         return dup;
@@ -90,40 +93,36 @@ class Curl extends hxcurl.Curl
     public function escape(str:String):String
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
         try {
             return Curl.hxcurl_easy_escape(this.handle, str);
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
     }
 
     /**
      *
      */
-    public function getInfo(info:CurlInfo):Dynamic
+    /*public function getInfo(info:CurlInfo):Dynamic
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
         try {
-            var ret:Dynamic = Curl.hxcurl_easy_getinfo(this.handle, info, info.returnType());
-            if (Std.is(ret, Array)) {
-                var type:CurlStruct = ret[0];
-                ret = switch (type) {
-                    case SLIST: ret[1].split("_-_");
-                    default:    ret[1];
-                }
+            var ret:Dynamic = switch(info.returnType()) {
+                case 0:  Curl.hxcurl_easy_getinfo_string(this.handle, info);
+                default: null;
             }
 
             return ret;
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
-    }
+    }*/
 
     /**
      *
@@ -131,46 +130,57 @@ class Curl extends hxcurl.Curl
     public function pause(bitmask:CurlPause):Void
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
         try {
             Curl.hxcurl_easy_pause(this.handle, bitmask);
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
     }
 
     /**
      *
      */
-    public function perform():String
+    public function perform():Bytes
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
         try {
-            return Curl.hxcurl_easy_perform(this.handle);
+            return Bytes.ofData(Curl.hxcurl_easy_perform(this.handle));
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
     }
 
     /**
      *
      */
-    public function read(bytes:Int):String
+    public function read(bytes:Int = 1024):Bytes
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
-        try {
-            return Curl.hxcurl_easy_recv(this.handle, bytes);
-        } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+        if (bytes < 0) {
+            throw new IllegalArgumentException("Cannot read a negative amount of bytes");
         }
+
+        var read:Bytes;
+        if (bytes == 0) {
+            read = Bytes.alloc(0);
+        } else {
+            try {
+                read = Bytes.ofData(Curl.hxcurl_easy_recv(this.handle, bytes));
+            } catch (ex:Dynamic) {
+                throw new CurlException(ex);
+            }
+        }
+
+        return read;
     }
 
     /**
@@ -179,13 +189,13 @@ class Curl extends hxcurl.Curl
     public function reset():Void
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
         try {
             Curl.hxcurl_easy_reset(this.handle);
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
     }
 
@@ -195,13 +205,13 @@ class Curl extends hxcurl.Curl
     public function setOption(option:CurlOpt, value:Dynamic):Void
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
         try {
             Curl.hxcurl_easy_setopt(this.handle, option, value);
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
     }
 
@@ -211,29 +221,36 @@ class Curl extends hxcurl.Curl
     public function unescape(str:String):String
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
         try {
             return Curl.hxcurl_easy_unescape(this.handle, str);
         } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+            throw new CurlException(ex);
         }
     }
 
     /**
      *
      */
-    public function write(msg:String):Int
+    public function write(bytes:Bytes):Int
     {
         if (this.handle == null) {
-            throw new CurlException();
+            throw new IllegalStateException();
         }
 
-        try {
-            return Curl.hxcurl_easy_send(this.handle, msg);
-        } catch (ex:Dynamic) {
-            throw new NativeCurlException(ex);
+        var sent:Int;
+        if (bytes == null || bytes.length == 0) {
+            sent = 0;
+        } else {
+            try {
+                sent = Curl.hxcurl_easy_send(this.handle, bytes.getData(), bytes.length);
+            } catch (ex:Dynamic) {
+                throw new CurlException(ex);
+            }
         }
+
+        return sent;
     }
 }

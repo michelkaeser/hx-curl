@@ -7,6 +7,7 @@ package hxcurl;
 #else
     #error "Curl (and the whole hxcurl library) is only supported on C++ and Neko targets."
 #end
+import hxcurl.CurlException;
 import hxcurl.CurlHandle;
 
 /**
@@ -27,8 +28,10 @@ class Curl
               function(len:Int) { var r = []; if (len > 0) r[len - 1] = null; return r; },
               null, true, false
             );
+            i;
+        } else {
+            throw new CurlException("Could not find NekoApi @ libcurl.");
         }
-        i;
     }
     #end
 

@@ -1,7 +1,7 @@
-package hxcurl;
+package hxcurl.easy;
 
 /**
- * Abstract enums wrapping the various libcurl pause codes.
+ * Abstract enums wrapping the various libcurl easy pause codes.
  *
  * @link http://curl.haxx.se/libcurl/c/curl_easy_pause.html
  * @link https://github.com/bagder/curl/blob/ade380a7aa1241fd7a2e16ee0c44fe268b42ff9a/include/curl/curl.h#L2288-L2297
@@ -17,7 +17,7 @@ abstract CurlPause(Int) to Int
 
 
 /**
- * libcurl pause offsets.
+ * libcurl easy pause offsets.
  */
 @:enum
 private abstract CurlPauseOffset(Int) to Int

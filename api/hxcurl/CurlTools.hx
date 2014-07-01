@@ -1,6 +1,6 @@
 package hxcurl;
 
-import hxcurl.CurlInfo;
+import hxcurl.easy.CurlInfo;
 
 /**
  *

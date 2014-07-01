@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -48,8 +48,6 @@
  */
 #include "curl.h"
 
-#include <Availability.h>
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -66,6 +64,8 @@ typedef enum {
   CURLM_INTERNAL_ERROR,  /* this is a libcurl bug */
   CURLM_BAD_SOCKET,      /* the passed in socket argument did not match */
   CURLM_UNKNOWN_OPTION,  /* curl_multi_setopt() with unsupported option */
+  CURLM_ADDED_ALREADY,   /* an easy handle already added to a multi handle was
+                            attempted to get added - again */
   CURLM_LAST
 } CURLMcode;
 
@@ -156,7 +156,6 @@ CURL_EXTERN CURLMcode curl_multi_fdset(CURLM *multi_handle,
  *
  * Returns:  CURLMcode type, general multi error code.
  */
-__OSX_AVAILABLE_STARTING(__MAC_10_9, __IPHONE_7_0)
 CURL_EXTERN CURLMcode curl_multi_wait(CURLM *multi_handle,
                                       struct curl_waitfd extra_fds[],
                                       unsigned int extra_nfds,
