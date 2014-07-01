@@ -1,4 +1,4 @@
-package hxcurl;
+package hxcurl.share;
 
 /**
  * Abstract enums wrapping the various libcurl share option codes.

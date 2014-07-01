@@ -150,7 +150,7 @@ value hxcurl_easy_unescape(value curl, value str);
  */
 inline ECALLBACKS* malloc_easy_callbacks(void)
 {
-    const ECALLBACKS callbacks = { NULL, NULL, NULL, NULL, NULL};
+    const ECALLBACKS callbacks = { NULL, NULL, NULL, NULL, NULL };
     ECALLBACKS* mcallbacks = (ECALLBACKS*)malloc(sizeof(ECALLBACKS));
     memcpy(mcallbacks, &callbacks, sizeof(ECALLBACKS));
 
@@ -163,7 +163,7 @@ inline ECALLBACKS* malloc_easy_callbacks(void)
  */
 inline EDATA* malloc_easy_data(void)
 {
-    const EDATA data = { NULL, NULL, NULL, NULL, NULL};
+    const EDATA data = { NULL, NULL, NULL, NULL, NULL };
     EDATA* mdata = (EDATA*)malloc(sizeof(EDATA));
     memcpy(mdata, &data, sizeof(EDATA));
 

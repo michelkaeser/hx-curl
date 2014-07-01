@@ -427,7 +427,9 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
         case CURLOPT_DEBUGFUNCTION: {
             root_set(&ecurl->callbacks->debug, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGFUNCTION, debug_callback);
-            ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGDATA, ecurl);
+            if (ret == CURLE_OK) {
+                ret = curl_easy_setopt(ecurl->handle, CURLOPT_DEBUGDATA, ecurl);
+            }
             break;
         }
         case CURLOPT_HEADERDATA: {
@@ -438,7 +440,9 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
         case CURLOPT_HEADERFUNCTION: {
             root_set(&ecurl->callbacks->header, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERFUNCTION, header_callback);
-            ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERDATA, ecurl);
+            if (ret == CURLE_OK) {
+                ret = curl_easy_setopt(ecurl->handle, CURLOPT_HEADERDATA, ecurl);
+            }
             break;
         }
         case CURLOPT_PROGRESSDATA: {
@@ -449,7 +453,9 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
         case CURLOPT_PROGRESSFUNCTION: {
             root_set(&ecurl->callbacks->progress, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSFUNCTION, progress_callback);
-            ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSDATA, ecurl);
+            if (ret == CURLE_OK) {
+                ret = curl_easy_setopt(ecurl->handle, CURLOPT_PROGRESSDATA, ecurl);
+            }
             break;
         }
         case CURLOPT_READDATA: {
@@ -460,7 +466,9 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
         case CURLOPT_READFUNCTION: {
             root_set(&ecurl->callbacks->progress, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_READFUNCTION, read_callback);
-            ret = curl_easy_setopt(ecurl->handle, CURLOPT_READDATA, ecurl);
+            if (ret == CURLE_OK) {
+                ret = curl_easy_setopt(ecurl->handle, CURLOPT_READDATA, ecurl);
+            }
             break;
         }
         case CURLOPT_WRITEDATA: {
@@ -471,7 +479,9 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
         case CURLOPT_WRITEFUNCTION: {
             root_set(&ecurl->callbacks->write, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEFUNCTION, write_callback);
-            ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEDATA, ecurl);
+            if (ret == CURLE_OK) {
+                ret = curl_easy_setopt(ecurl->handle, CURLOPT_WRITEDATA, ecurl);
+            }
             break;
         }
         default: {
