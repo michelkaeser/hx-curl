@@ -8,7 +8,7 @@ extern "C" {
 #include "hx_libcurl.hpp"
 
 
-DEFINE_KIND(k_easy_curl);
+DECLARE_KIND(k_easy_curl);
 
 #define alloc_easy_curl(v)      alloc_abstract(k_easy_curl, v)
 #define curl_easy_error(ret)    val_throw(alloc_string(curl_easy_strerror(ret)))
@@ -150,6 +150,8 @@ value hxcurl_easy_unescape(value curl, value str);
  */
 inline ECALLBACKS* malloc_easy_callbacks(void)
 {
+    extern void* memcpy(void* dest, const void* src, size_t count);
+
     const ECALLBACKS callbacks = { NULL, NULL, NULL, NULL, NULL };
     ECALLBACKS* mcallbacks = (ECALLBACKS*)malloc(sizeof(ECALLBACKS));
     memcpy(mcallbacks, &callbacks, sizeof(ECALLBACKS));
@@ -163,6 +165,8 @@ inline ECALLBACKS* malloc_easy_callbacks(void)
  */
 inline EDATA* malloc_easy_data(void)
 {
+    extern void* memcpy(void* dest, const void* src, size_t count);
+
     const EDATA data = { NULL, NULL, NULL, NULL, NULL };
     EDATA* mdata = (EDATA*)malloc(sizeof(EDATA));
     memcpy(mdata, &data, sizeof(EDATA));

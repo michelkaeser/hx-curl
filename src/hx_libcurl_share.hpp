@@ -8,7 +8,7 @@ extern "C" {
 #include "hx_libcurl.hpp"
 
 
-DEFINE_KIND(k_share_curl);
+DECLARE_KIND(k_share_curl);
 
 #define alloc_share_curl(v)    alloc_abstract(k_share_curl, v)
 #define curl_share_error(ret)  val_throw(alloc_string(curl_share_strerror(ret)))

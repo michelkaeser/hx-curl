@@ -5,8 +5,12 @@
 #include <curl/curl.h>
 
 #include "hx_libcurl_easy.hpp"
+#include "hx_libcurl_share.hpp"
 
 extern "C" {
+
+DEFINE_KIND(k_easy_curl);
+
 
 static value hxcurl_easy_getinfo_double(value, value);
 static value hxcurl_easy_getinfo_long(value, value);
@@ -461,6 +465,11 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
         case CURLOPT_READDATA: {
             ecurl->data->read = optval;
             ret = CURLE_OK;
+            break;
+        }
+        case CURLOPT_SHARE : {
+            val_check_kind(optval, k_share_curl);
+            ret = curl_easy_setopt(ecurl->handle, CURLOPT_SHARE, val_share_handle(optval));
             break;
         }
         case CURLOPT_READFUNCTION: {

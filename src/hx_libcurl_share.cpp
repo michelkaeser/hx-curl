@@ -7,6 +7,9 @@
 
 extern "C" {
 
+DEFINE_KIND(k_share_curl);
+
+
 static void lock_function(CURL*, curl_lock_data, curl_lock_access, void*);
 static void unlock_function(CURL*, curl_lock_data, void*);
 
