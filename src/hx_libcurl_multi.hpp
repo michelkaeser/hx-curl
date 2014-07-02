@@ -12,7 +12,7 @@ DECLARE_KIND(k_multi_curl);
 
 #define alloc_multi_curl(v)    alloc_abstract(k_multi_curl, v)
 #define curl_multi_error(ret)  val_throw(alloc_string(curl_multi_strerror(ret)))
-#define malloc_multi_curl()    (MCURL*)malloc(sizeof(MCURL))
+#define malloc_multi_curl()    (MCURL*)alloc_private(sizeof(MCURL))
 #define val_multi_curl(v)      (MCURL*)val_data(v)
 #define val_multi_handle(v)    (val_multi_curl(v))->handle
 #define val_is_multi_curl(v)   val_is_kind(v, k_multi_curl)
@@ -153,7 +153,7 @@ inline MCALLBACKS* malloc_multi_callbacks(void)
     extern void* memcpy(void* dest, const void* src, size_t count);
 
     const MCALLBACKS callbacks = { NULL, NULL };
-    MCALLBACKS* mcallbacks = (MCALLBACKS*)malloc(sizeof(MCALLBACKS));
+    MCALLBACKS* mcallbacks = (MCALLBACKS*)alloc_private(sizeof(MCALLBACKS));
     memcpy(mcallbacks, &callbacks, sizeof(MCALLBACKS));
 
     return mcallbacks;
@@ -168,7 +168,7 @@ inline MDATA* malloc_multi_data(void)
     extern void* memcpy(void* dest, const void* src, size_t count);
 
     const MDATA data = { NULL, NULL };
-    MDATA* mdata = (MDATA*)malloc(sizeof(MDATA));
+    MDATA* mdata = (MDATA*)alloc_private(sizeof(MDATA));
     memcpy(mdata, &data, sizeof(MDATA));
 
     return mdata;

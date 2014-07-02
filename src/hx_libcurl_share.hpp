@@ -12,7 +12,7 @@ DECLARE_KIND(k_share_curl);
 
 #define alloc_share_curl(v)    alloc_abstract(k_share_curl, v)
 #define curl_share_error(ret)  val_throw(alloc_string(curl_share_strerror(ret)))
-#define malloc_share_curl()    (SCURL*)malloc(sizeof(SCURL))
+#define malloc_share_curl()    (SCURL*)alloc_private(sizeof(SCURL))
 #define val_share_curl(v)      (SCURL*)val_data(v)
 #define val_share_handle(v)    (val_share_curl(v))->handle
 #define val_is_share_curl(v)   val_is_kind(v, k_share_curl)
@@ -78,7 +78,7 @@ inline SCALLBACKS* malloc_share_callbacks(void)
     extern void* memcpy(void* dest, const void* src, size_t count);
 
     const SCALLBACKS callbacks = { NULL, NULL };
-    SCALLBACKS* mcallbacks = (SCALLBACKS*)malloc(sizeof(SCALLBACKS));
+    SCALLBACKS* mcallbacks = (SCALLBACKS*)alloc_private(sizeof(SCALLBACKS));
     memcpy(mcallbacks, &callbacks, sizeof(SCALLBACKS));
 
     return mcallbacks;
