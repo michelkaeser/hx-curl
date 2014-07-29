@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "hx_libcurl.hpp"
+#include "hxcurl/curl.hpp"
 
 
 DECLARE_KIND(k_share_curl);

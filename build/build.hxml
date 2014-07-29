@@ -9,15 +9,16 @@
 
     <set name="HXCPP_CPP11" value="1" />
 
-    <!-- Define all cpp files that need to be compiled into the nanomsg.ndll -->
+    <!-- Define all cpp files that need to be compiled into the libcurl.ndll -->
     <files id="files">
         <!-- Set up include folder paths -->
+        <compilerflag value="-I./include" />
         <compilerflag value="-I./../include" />
 
         <!-- List of cpp files to be compiled -->
-        <file name="src/hx_libcurl_easy.cpp" />
-        <file name="src/hx_libcurl_multi.cpp" />
-        <file name="src/hx_libcurl_share.cpp" />
+        <file name="src/curl_easy.cpp" />
+        <file name="src/curl_multi.cpp" />
+        <file name="src/curl_share.cpp" />
     </files>
 
     <!-- define compiler build & linking target -->
@@ -31,7 +32,7 @@
         <!-- specific previously defined list of files to compile -->
         <files id="files" />
 
-        <!-- link to libnanomsg installed through homebrew -->
+        <!-- link to libcurl install -->
         <lib name="libcurl.lib" if="windows" />
         <lib name="-lcurl" unless="windows" />
     </target>

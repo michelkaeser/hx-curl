@@ -1,11 +1,11 @@
-#ifndef __HX_LIBCURL_EASY_HPP
-#define __HX_LIBCURL_EASY_HPP
+#ifndef __HX_CURL_EASY_HPP
+#define __HX_CURL_EASY_HPP
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "hx_libcurl.hpp"
+#include "hxcurl/curl.hpp"
 
 
 DECLARE_KIND(k_easy_curl);
@@ -178,4 +178,4 @@ inline EDATA* malloc_easy_data(void)
 } // extern "C"
 #endif
 
-#endif /* __HX_LIBCURL_EASY_HPP */
+#endif /* __HX_CURL_EASY_HPP */

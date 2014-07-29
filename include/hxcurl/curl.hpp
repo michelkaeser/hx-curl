@@ -1,5 +1,5 @@
-#ifndef __HX_LIBCURL_HPP
-#define __HX_LIBCURL_HPP
+#ifndef __HX_CURL_HPP
+#define __HX_CURL_HPP
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +35,4 @@ inline void root_set(AutoGCRoot** root, value val)
 } // extern "C"
 #endif
 
-#endif /* __HX_LIBCURL_HPP */
+#endif /* __HX_CURL_HPP */

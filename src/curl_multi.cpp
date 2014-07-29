@@ -3,8 +3,8 @@
 #include <hx/CFFI.h>
 #include <curl/curl.h>
 
-#include "hx_libcurl_multi.hpp"
-#include "hx_libcurl_easy.hpp"
+#include "hxcurl/curl_multi.hpp"
+#include "hxcurl/curl_easy.hpp"
 
 extern "C" {
 

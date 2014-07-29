@@ -3,7 +3,7 @@
 #include <hx/CFFI.h>
 #include <curl/curl.h>
 
-#include "hx_libcurl_share.hpp"
+#include "hxcurl/curl_share.hpp"
 
 extern "C" {
 

@@ -1,11 +1,11 @@
-#ifndef __HX_LIBCURL_MULTI_HPP
-#define __HX_LIBCURL_MULTI_HPP
+#ifndef __HX_CURL_MULTI_HPP
+#define __HX_CURL_MULTI_HPP
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "hx_libcurl.hpp"
+#include "hxcurl/curl.hpp"
 
 
 DECLARE_KIND(k_multi_curl);
@@ -178,4 +178,4 @@ inline MDATA* malloc_multi_data(void)
 } // extern "C"
 #endif
 
-#endif /* __HX_LIBCURL_MULTI_HPP */
+#endif /* __HX_CURL_MULTI_HPP */
