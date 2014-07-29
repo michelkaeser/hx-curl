@@ -73,8 +73,6 @@ void finalize_easy_curl_abstract(value curl)
             finalize_easy_curl_callbacks(ecurl->callbacks);
             ecurl->callbacks = NULL;
             ecurl->data = NULL;
-            free(ecurl);
-            ecurl = NULL;
         }
     }
 }

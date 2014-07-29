@@ -26,8 +26,6 @@ void finalize_share_curl_abstract(value curl)
             scurl->cleanup = (bool)NULL;
             finalize_share_curl_callbacks(scurl->callbacks);
             scurl->callbacks = NULL;
-            free(scurl);
-            scurl = NULL;
         }
     }
 }

@@ -21,8 +21,6 @@ void finalize_multi_curl_abstract(value val)
                 mcurl->handle = NULL;
             }
             mcurl->cleanup = (bool)NULL;
-            free(mcurl);
-            mcurl = NULL;
         }
     }
 }
