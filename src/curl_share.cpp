@@ -52,7 +52,7 @@ void finalize_share_curl_handle(CURLSH* handle)
 }
 
 
-value hxcurl_share_cleanup(value curl)
+value hx_curl_share_cleanup(value curl)
 {
     val_check_kind(curl, k_share_curl);
 
@@ -67,10 +67,10 @@ value hxcurl_share_cleanup(value curl)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_share_cleanup, 1);
+DEFINE_PRIM(hx_curl_share_cleanup, 1);
 
 
-value hxcurl_share_init(void)
+value hx_curl_share_init(void)
 {
     value val;
     CURLSH* handle = curl_share_init();
@@ -89,10 +89,10 @@ value hxcurl_share_init(void)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_share_init, 0);
+DEFINE_PRIM(hx_curl_share_init, 0);
 
 
-value hxcurl_share_setopt(value curl, value curlopt, value optval)
+value hx_curl_share_setopt(value curl, value curlopt, value optval)
 {
     val_check_kind(curl, k_share_curl);
     val_check(curlopt, int);
@@ -132,7 +132,7 @@ value hxcurl_share_setopt(value curl, value curlopt, value optval)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_share_setopt, 3);
+DEFINE_PRIM(hx_curl_share_setopt, 3);
 
 
 static void lock_function(CURL* handle, curl_lock_data data, curl_lock_access access, void* userptr)

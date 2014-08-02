@@ -58,91 +58,91 @@ void finalize_multi_curl_handle(CURLM* handle);
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_add_handle.html
  */
-value hxcurl_multi_add_handle(value multi_curl, value easy_curl);
+value hx_curl_multi_add_handle(value multi_curl, value easy_curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_assign.html
  */
-value hxcurl_multi_assign(value curl, ...);
+value hx_curl_multi_assign(value curl, ...);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_cleanup.html
  */
-value hxcurl_multi_cleanup(value curl);
+value hx_curl_multi_cleanup(value curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_fdset.html
  */
-value hxcurl_multi_fdset(...);
+value hx_curl_multi_fdset(...);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_info_read.html
  */
-value hxcurl_multi_info_read(...);
+value hx_curl_multi_info_read(...);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_init.html
  */
-value hxcurl_multi_init(void);
+value hx_curl_multi_init(void);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_perform.html
  */
-value hxcurl_multi_perform(value curl);
+value hx_curl_multi_perform(value curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_remove_handle.html
  */
-value hxcurl_multi_remove_handle(value multi_curl, value easy_curl);
+value hx_curl_multi_remove_handle(value multi_curl, value easy_curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_setopt.html
  */
-value hxcurl_multi_setopt(value curl, value curlopt, value optval);
+value hx_curl_multi_setopt(value curl, value curlopt, value optval);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_socket.html
  */
-value hxcurl_multi_socket(...);
+value hx_curl_multi_socket(...);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_socket_action.html
  */
-value hxcurl_multi_socket_action(...);
+value hx_curl_multi_socket_action(...);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_timeout.html
  */
-value hxcurl_multi_timeout(value curl);
+value hx_curl_multi_timeout(value curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_multi_timeout.html
  */
-value hxcurl_multi_wait(...);
+value hx_curl_multi_wait(...);
 
 
 /*

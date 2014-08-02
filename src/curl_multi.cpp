@@ -47,7 +47,7 @@ void finalize_multi_curl_handle(CURLM* handle)
 }
 
 
-value hxcurl_multi_add_handle(value multi_curl, value easy_curl)
+value hx_curl_multi_add_handle(value multi_curl, value easy_curl)
 {
     val_check_kind(multi_curl, k_multi_curl);
     val_check_kind(multi_curl, k_easy_curl);
@@ -59,10 +59,10 @@ value hxcurl_multi_add_handle(value multi_curl, value easy_curl)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_multi_add_handle, 2);
+DEFINE_PRIM(hx_curl_multi_add_handle, 2);
 
 
-value hxcurl_multi_cleanup(value curl)
+value hx_curl_multi_cleanup(value curl)
 {
     val_check_kind(curl, k_multi_curl);
 
@@ -81,10 +81,10 @@ value hxcurl_multi_cleanup(value curl)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_multi_cleanup, 1);
+DEFINE_PRIM(hx_curl_multi_cleanup, 1);
 
 
-value hxcurl_multi_init(void)
+value hx_curl_multi_init(void)
 {
     value val;
     CURLM* handle = curl_multi_init();
@@ -102,10 +102,10 @@ value hxcurl_multi_init(void)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_multi_init, 0);
+DEFINE_PRIM(hx_curl_multi_init, 0);
 
 
-value hxcurl_multi_perform(value curl)
+value hx_curl_multi_perform(value curl)
 {
     val_check_kind(curl, k_multi_curl);
 
@@ -121,10 +121,10 @@ value hxcurl_multi_perform(value curl)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_multi_perform, 1);
+DEFINE_PRIM(hx_curl_multi_perform, 1);
 
 
-value hxcurl_multi_remove_handle(value multi_curl, value easy_curl)
+value hx_curl_multi_remove_handle(value multi_curl, value easy_curl)
 {
     val_check_kind(multi_curl, k_multi_curl);
     val_check_kind(multi_curl, k_easy_curl);
@@ -136,10 +136,10 @@ value hxcurl_multi_remove_handle(value multi_curl, value easy_curl)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_multi_remove_handle, 2);
+DEFINE_PRIM(hx_curl_multi_remove_handle, 2);
 
 
-value hxcurl_multi_setopt(value curl, value curlopt, value optval)
+value hx_curl_multi_setopt(value curl, value curlopt, value optval)
 {
     val_check_kind(curl, k_multi_curl);
     val_check(curlopt, int);
@@ -203,10 +203,10 @@ value hxcurl_multi_setopt(value curl, value curlopt, value optval)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_multi_setopt, 3);
+DEFINE_PRIM(hx_curl_multi_setopt, 3);
 
 
-value hxcurl_multi_timeout(value curl)
+value hx_curl_multi_timeout(value curl)
 {
     val_check_kind(curl, k_multi_curl);
 
@@ -222,6 +222,6 @@ value hxcurl_multi_timeout(value curl)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_multi_timeout, 1);
+DEFINE_PRIM(hx_curl_multi_timeout, 1);
 
 } // extern "C"

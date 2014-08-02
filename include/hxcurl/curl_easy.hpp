@@ -66,83 +66,83 @@ void finalize_easy_curl_handle(CURL* handle);
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_cleanup.html
  */
-value hxcurl_easy_cleanup(value curl);
+value hx_curl_easy_cleanup(value curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_duphandle.html
  */
-value hxcurl_easy_duphandle(value curl);
+value hx_curl_easy_duphandle(value curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_escape.html
  */
-value hxcurl_easy_escape(value curl, value str);
+value hx_curl_easy_escape(value curl, value str);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_getinfo.html
  */
-value hxcurl_easy_getinfo(value curl, value info, value type);
+value hx_curl_easy_getinfo(value curl, value info, value type);
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_init.html
  */
-value hxcurl_easy_init(void);
+value hx_curl_easy_init(void);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_pause.html
  */
-value hxcurl_easy_pause(value curl, value bitmask);
+value hx_curl_easy_pause(value curl, value bitmask);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_perform.html
  */
-value hxcurl_easy_perform(value curl);
+value hx_curl_easy_perform(value curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_recv.html
  */
-value hxcurl_easy_recv(value curl, value length);
+value hx_curl_easy_recv(value curl, value length);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_reset.html
  */
-value hxcurl_easy_reset(value curl);
+value hx_curl_easy_reset(value curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_send.html
  */
-value hxcurl_easy_send(value curl, value bytes, value length);
+value hx_curl_easy_send(value curl, value bytes, value length);
 
 
 /*
  *
  * See: See: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
  */
-value hxcurl_easy_setopt(value curl, value option, value optval);
+value hx_curl_easy_setopt(value curl, value option, value optval);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_easy_unescape.html
  */
-value hxcurl_easy_unescape(value curl, value str);
+value hx_curl_easy_unescape(value curl, value str);
 
 
 /*

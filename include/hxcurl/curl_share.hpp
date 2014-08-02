@@ -53,21 +53,21 @@ void finalize_share_curl_handle(CURLSH* handle);
  *
  * See: http://curl.haxx.se/libcurl/c/curl_share_cleanup.html
  */
-value hxcurl_share_cleanup(value curl);
+value hx_curl_share_cleanup(value curl);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_share_setopt.html
  */
-value hxcurl_share_setopt(value curl, value curlopt, value optval);
+value hx_curl_share_setopt(value curl, value curlopt, value optval);
 
 
 /*
  *
  * See: http://curl.haxx.se/libcurl/c/curl_share_init.html
  */
-value hxcurl_share_init(void);
+value hx_curl_share_init(void);
 
 
 /*

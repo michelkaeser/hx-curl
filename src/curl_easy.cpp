@@ -12,9 +12,9 @@ extern "C" {
 DEFINE_KIND(k_easy_curl);
 
 
-static value hxcurl_easy_getinfo_double(value, value);
-static value hxcurl_easy_getinfo_long(value, value);
-static value hxcurl_easy_getinfo_string(value, value);
+static value hx_curl_easy_getinfo_double(value, value);
+static value hx_curl_easy_getinfo_long(value, value);
+static value hx_curl_easy_getinfo_string(value, value);
 
 // http://curl.haxx.se/libcurl/c/CURLOPT_DEBUGFUNCTION.html
 static int debug_callback(CURL*, curl_infotype, char*, size_t, void*);
@@ -129,7 +129,7 @@ static size_t header_callback(char* buf, size_t size, size_t nitems, void* userd
 }
 
 
-value hxcurl_easy_cleanup(value curl)
+value hx_curl_easy_cleanup(value curl)
 {
     val_check_kind(curl, k_easy_curl);
 
@@ -144,10 +144,10 @@ value hxcurl_easy_cleanup(value curl)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_easy_cleanup, 1);
+DEFINE_PRIM(hx_curl_easy_cleanup, 1);
 
 
-value hxcurl_easy_duphandle(value curl)
+value hx_curl_easy_duphandle(value curl)
 {
     val_check_kind(curl, k_easy_curl);
 
@@ -172,10 +172,10 @@ value hxcurl_easy_duphandle(value curl)
 
     return dval;
 }
-DEFINE_PRIM(hxcurl_easy_duphandle, 1);
+DEFINE_PRIM(hx_curl_easy_duphandle, 1);
 
 
-value hxcurl_easy_escape(value curl, value str)
+value hx_curl_easy_escape(value curl, value str)
 {
     val_check_kind(curl, k_easy_curl);
     val_check(str, string);
@@ -192,10 +192,10 @@ value hxcurl_easy_escape(value curl, value str)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_easy_escape, 2);
+DEFINE_PRIM(hx_curl_easy_escape, 2);
 
 
-value hxcurl_easy_getinfo(value curl, value info, value type)
+value hx_curl_easy_getinfo(value curl, value info, value type)
 {
     val_check_kind(curl, k_easy_curl);
     val_check(info, int);
@@ -204,15 +204,15 @@ value hxcurl_easy_getinfo(value curl, value info, value type)
     value val;
     switch (val_int(type)) {
         case 0: {
-            val = hxcurl_easy_getinfo_string(curl, info);
+            val = hx_curl_easy_getinfo_string(curl, info);
             break;
         }
         case 1: {
-            val = hxcurl_easy_getinfo_double(curl, info);
+            val = hx_curl_easy_getinfo_double(curl, info);
             break;
         }
         case 2: {
-            val = hxcurl_easy_getinfo_long(curl, info);
+            val = hx_curl_easy_getinfo_long(curl, info);
             break;
         }
         default: {
@@ -224,9 +224,9 @@ value hxcurl_easy_getinfo(value curl, value info, value type)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_easy_getinfo, 3);
+DEFINE_PRIM(hx_curl_easy_getinfo, 3);
 
-static value hxcurl_easy_getinfo_double(value curl, value info)
+static value hx_curl_easy_getinfo_double(value curl, value info)
 {
     value val;
     double info_val;
@@ -241,7 +241,7 @@ static value hxcurl_easy_getinfo_double(value curl, value info)
     return val;
 }
 
-static value hxcurl_easy_getinfo_long(value curl, value info)
+static value hx_curl_easy_getinfo_long(value curl, value info)
 {
     value val;
     long info_val;
@@ -256,7 +256,7 @@ static value hxcurl_easy_getinfo_long(value curl, value info)
     return val;
 }
 
-static value hxcurl_easy_getinfo_string(value curl, value info)
+static value hx_curl_easy_getinfo_string(value curl, value info)
 {
     value val;
     char* info_val;
@@ -272,7 +272,7 @@ static value hxcurl_easy_getinfo_string(value curl, value info)
 }
 
 
-value hxcurl_easy_init(void)
+value hx_curl_easy_init(void)
 {
     value val;
     CURL* handle = curl_easy_init();
@@ -293,10 +293,10 @@ value hxcurl_easy_init(void)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_easy_init, 0);
+DEFINE_PRIM(hx_curl_easy_init, 0);
 
 
-value hxcurl_easy_pause(value curl, value bitmask)
+value hx_curl_easy_pause(value curl, value bitmask)
 {
     val_check_kind(curl, k_easy_curl);
     val_check(bitmask, int);
@@ -308,10 +308,10 @@ value hxcurl_easy_pause(value curl, value bitmask)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_easy_pause, 2);
+DEFINE_PRIM(hx_curl_easy_pause, 2);
 
 
-value hxcurl_easy_perform(value curl)
+value hx_curl_easy_perform(value curl)
 {
     val_check_kind(curl, k_easy_curl);
 
@@ -345,10 +345,10 @@ value hxcurl_easy_perform(value curl)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_easy_perform, 1);
+DEFINE_PRIM(hx_curl_easy_perform, 1);
 
 
-value hxcurl_easy_recv(value curl, value length)
+value hx_curl_easy_recv(value curl, value length)
 {
     val_check_kind(curl, k_easy_curl);
     val_check(length, int);
@@ -369,10 +369,10 @@ value hxcurl_easy_recv(value curl, value length)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_easy_recv, 2);
+DEFINE_PRIM(hx_curl_easy_recv, 2);
 
 
-value hxcurl_easy_reset(value curl)
+value hx_curl_easy_reset(value curl)
 {
     val_check_kind(curl, k_easy_curl);
 
@@ -382,10 +382,10 @@ value hxcurl_easy_reset(value curl)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_easy_reset, 1);
+DEFINE_PRIM(hx_curl_easy_reset, 1);
 
 
-value hxcurl_easy_send(value curl, value bytes, value length)
+value hx_curl_easy_send(value curl, value bytes, value length)
 {
     val_check_kind(curl, k_easy_curl);
     val_check(length, int);
@@ -410,10 +410,10 @@ value hxcurl_easy_send(value curl, value bytes, value length)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_easy_send, 3);
+DEFINE_PRIM(hx_curl_easy_send, 3);
 
 
-value hxcurl_easy_setopt(value curl, value curlopt, value optval)
+value hx_curl_easy_setopt(value curl, value curlopt, value optval)
 {
     val_check_kind(curl, k_easy_curl);
     val_check(curlopt, int);
@@ -516,10 +516,10 @@ value hxcurl_easy_setopt(value curl, value curlopt, value optval)
 
     return alloc_null();
 }
-DEFINE_PRIM(hxcurl_easy_setopt, 3);
+DEFINE_PRIM(hx_curl_easy_setopt, 3);
 
 
-value hxcurl_easy_unescape(value curl, value str)
+value hx_curl_easy_unescape(value curl, value str)
 {
     val_check_kind(curl, k_easy_curl);
     val_check(str, string);
@@ -536,7 +536,7 @@ value hxcurl_easy_unescape(value curl, value str)
 
     return val;
 }
-DEFINE_PRIM(hxcurl_easy_unescape, 2);
+DEFINE_PRIM(hx_curl_easy_unescape, 2);
 
 
 static int progress_callback(void* clientp, double dltotal, double dlnow, double ultotal, double ulnow)

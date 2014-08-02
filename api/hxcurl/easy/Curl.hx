@@ -1,16 +1,10 @@
 package hxcurl.easy;
 
-#if cpp
-    import cpp.Lib;
-#elseif neko
-    import neko.Lib;
-#else
-    #error "easy.Curl (and the whole hxcurl library) is only supported on C++ and Neko targets."
-#end
 import haxe.io.Bytes;
 import haxe.io.BytesData;
 import hxcurl.CurlHandle;
 import hxcurl.CurlException;
+import hxcurl.Loader;
 import hxcurl.easy.CurlInfo;
 import hxcurl.easy.CurlOpt;
 import hxcurl.easy.CurlPause;
@@ -27,18 +21,18 @@ class Curl extends hxcurl.Curl
     /**
      * References to the native CURL function implementations loaded through C FFI.
      */
-    private static var hxcurl_easy_cleanup:CurlHandle->Void           = Lib.load("libcurl", "hxcurl_easy_cleanup", 1);
-    private static var hxcurl_easy_duphandle:CurlHandle->CurlHandle   = Lib.load("libcurl", "hxcurl_easy_duphandle", 1);
-    private static var hxcurl_easy_escape:CurlHandle->String->String  = Lib.load("libcurl", "hxcurl_easy_escape", 2);
-    private static var hxcurl_easy_getinfo:CurlHandle->CurlInfo->Int->Dynamic = Lib.load("libcurl", "hxcurl_easy_getinfo", 3);
-    private static var hxcurl_easy_init:Void->CurlHandle              = Lib.load("libcurl", "hxcurl_easy_init", 0);
-    private static var hxcurl_easy_pause:CurlHandle->CurlPause->Void  = Lib.load("libcurl", "hxcurl_easy_pause", 2);
-    private static var hxcurl_easy_perform:CurlHandle->BytesData      = Lib.load("libcurl", "hxcurl_easy_perform", 1);
-    private static var hxcurl_easy_recv:CurlHandle->Int->BytesData    = Lib.load("libcurl", "hxcurl_easy_recv", 2);
-    private static var hxcurl_easy_reset:CurlHandle->Void             = Lib.load("libcurl", "hxcurl_easy_reset", 1);
-    private static var hxcurl_easy_send:CurlHandle->BytesData->Int->Int = Lib.load("libcurl", "hxcurl_easy_send", 3);
-    private static var hxcurl_easy_setopt:CurlHandle->CurlOpt->Dynamic->Void = Lib.load("libcurl", "hxcurl_easy_setopt", 3);
-    private static var hxcurl_easy_unescape:CurlHandle->String->String = Lib.load("libcurl", "hxcurl_easy_unescape", 2);
+    private static var _cleanup:CurlHandle->Void                   = Loader.load("hx_curl_easy_cleanup", 1);
+    private static var _duphandle:CurlHandle->CurlHandle           = Loader.load("hx_curl_easy_duphandle", 1);
+    private static var _escape:CurlHandle->String->String          = Loader.load("hx_curl_easy_escape", 2);
+    private static var _getinfo:CurlHandle->CurlInfo->Int->Dynamic = Loader.load("hx_curl_easy_getinfo", 3);
+    private static var _init:Void->CurlHandle                      = Loader.load("hx_curl_easy_init", 0);
+    private static var _pause:CurlHandle->CurlPause->Void          = Loader.load("hx_curl_easy_pause", 2);
+    private static var _perform:CurlHandle->BytesData              = Loader.load("hx_curl_easy_perform", 1);
+    private static var _recv:CurlHandle->Int->BytesData            = Loader.load("hx_curl_easy_recv", 2);
+    private static var _reset:CurlHandle->Void                     = Loader.load("hx_curl_easy_reset", 1);
+    private static var _send:CurlHandle->BytesData->Int->Int       = Loader.load("hx_curl_easy_send", 3);
+    private static var _setopt:CurlHandle->CurlOpt->Dynamic->Void  = Loader.load("hx_curl_easy_setopt", 3);
+    private static var _unescape:CurlHandle->String->String        = Loader.load("hx_curl_easy_unescape", 2);
 
 
     /**
@@ -49,7 +43,7 @@ class Curl extends hxcurl.Curl
         super();
 
         try {
-            this.handle = Curl.hxcurl_easy_init();
+            this.handle = Curl._init();
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -65,7 +59,7 @@ class Curl extends hxcurl.Curl
         }
 
         try {
-            Curl.hxcurl_easy_cleanup(this.handle);
+            Curl._cleanup(this.handle);
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -78,7 +72,7 @@ class Curl extends hxcurl.Curl
     {
         var dup:Curl = new Curl();
         try {
-            dup.handle = Curl.hxcurl_easy_duphandle(this.handle);
+            dup.handle = Curl._duphandle(this.handle);
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -96,7 +90,7 @@ class Curl extends hxcurl.Curl
         }
 
         try {
-            return Curl.hxcurl_easy_escape(this.handle, str);
+            return Curl._escape(this.handle, str);
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -112,7 +106,7 @@ class Curl extends hxcurl.Curl
         }
 
         try {
-            return Curl.hxcurl_easy_getinfo(this.handle, info, CurlInfo.returnType(info));
+            return Curl._getinfo(this.handle, info, CurlInfo.returnType(info));
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -128,7 +122,7 @@ class Curl extends hxcurl.Curl
         }
 
         try {
-            Curl.hxcurl_easy_pause(this.handle, bitmask);
+            Curl._pause(this.handle, bitmask);
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -144,7 +138,7 @@ class Curl extends hxcurl.Curl
         }
 
         try {
-            return Bytes.ofData(Curl.hxcurl_easy_perform(this.handle));
+            return Bytes.ofData(Curl._perform(this.handle));
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -158,7 +152,6 @@ class Curl extends hxcurl.Curl
         if (this.handle == null) {
             throw new IllegalStateException();
         }
-
         if (bytes < 0) {
             throw new IllegalArgumentException("Cannot read a negative amount of bytes");
         }
@@ -168,7 +161,7 @@ class Curl extends hxcurl.Curl
             read = Bytes.alloc(0);
         } else {
             try {
-                read = Bytes.ofData(Curl.hxcurl_easy_recv(this.handle, bytes));
+                read = Bytes.ofData(Curl._recv(this.handle, bytes));
             } catch (ex:Dynamic) {
                 throw new CurlException(ex);
             }
@@ -187,7 +180,7 @@ class Curl extends hxcurl.Curl
         }
 
         try {
-            Curl.hxcurl_easy_reset(this.handle);
+            Curl._reset(this.handle);
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -203,7 +196,7 @@ class Curl extends hxcurl.Curl
         }
 
         try {
-            Curl.hxcurl_easy_setopt(this.handle, option, value);
+            Curl._setopt(this.handle, option, value);
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -219,7 +212,7 @@ class Curl extends hxcurl.Curl
         }
 
         try {
-            return Curl.hxcurl_easy_unescape(this.handle, str);
+            return Curl._unescape(this.handle, str);
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
@@ -239,7 +232,7 @@ class Curl extends hxcurl.Curl
             sent = 0;
         } else {
             try {
-                sent = Curl.hxcurl_easy_send(this.handle, bytes.getData(), bytes.length);
+                sent = Curl._send(this.handle, bytes.getData(), bytes.length);
             } catch (ex:Dynamic) {
                 throw new CurlException(ex);
             }
