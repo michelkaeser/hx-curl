@@ -19,7 +19,7 @@ class Loader
      *
      * @var String
      */
-    private static inline var library:String = "libcurl";
+    private static inline var library:String = "libhxcurl";
 
     #if neko
     // initializes the Neko API so alloc_null() etc. becomes valid

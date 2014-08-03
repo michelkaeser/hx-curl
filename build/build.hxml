@@ -9,7 +9,7 @@
 
     <set name="HXCPP_CPP11" value="1" />
 
-    <!-- Define all cpp files that need to be compiled into the libcurl.ndll -->
+    <!-- Define all cpp files that need to be compiled into the libhxcurl.ndll -->
     <files id="files">
         <!-- Set up include folder paths -->
         <compilerflag value="-I./include" />
@@ -22,7 +22,7 @@
     </files>
 
     <!-- define compiler build & linking target -->
-    <target id="libcurl.ndll" tool="linker" toolid="dll" output="libcurl">
+    <target id="libhxcurl.ndll" tool="linker" toolid="dll" output="libhxcurl">
         <ext value=".ndll" />
 
         <!-- output directory for linker. -->
@@ -39,6 +39,6 @@
 
     <!-- specifies default hxcpp build tool target -->
     <target id="default">
-        <target id="libcurl.ndll" />
+        <target id="libhxcurl.ndll" />
     </target>
 </xml>
