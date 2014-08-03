@@ -12,7 +12,7 @@ class CurlException extends Exception
     /**
      * @{inherit}
      */
-    public function new(msg:String = "Uncaught CURL exception", ?info:PosInfos):Void
+    public function new(msg:Dynamic = "Uncaught CURL exception", ?info:PosInfos):Void
     {
         super(msg, info);
     }

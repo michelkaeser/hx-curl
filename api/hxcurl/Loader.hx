@@ -32,7 +32,7 @@ class Loader
             );
             i;
         } else {
-            throw new Error("Could not find NekoAPI @ " + Loader.library + ".");
+            throw new Error("Could not find NekoAPI @ " + Loader.library);
         }
     }
     #end

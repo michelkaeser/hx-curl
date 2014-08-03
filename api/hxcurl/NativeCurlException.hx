@@ -12,7 +12,7 @@ class NativeCurlException extends CurlException
     /**
      * @{inherit}
      */
-    public function new(msg:String = "Exception thrown by called FF", ?info:PosInfos):Void
+    public function new(msg:Dynamic = "Exception thrown by called FF", ?info:PosInfos):Void
     {
         super(msg, info);
     }
