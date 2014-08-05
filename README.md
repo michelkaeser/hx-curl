@@ -2,6 +2,14 @@
 
 > Haxe (C++/Neko) language bindings for libcurl.
 
+## Nullability
+
+Haxe has a special type `Null<T>` which is mainly for documentation purpose and for static platforms (so e.g. `Int` can be `null`). You can find its typedef here: http://api.haxe.org/Null.html
+
+Trying to follow the documentation aspect, all methods that accept a nullable value (e.g. `Null<Bytes>`) can safely be called with `null` - it is ensured they will _not_ throw an Exception or Error.
+
+On the other hand, when a methods returns a value of type `Null<T>` that means, that the returned value may be `null`.
+
 ## License
 
 The MIT License (MIT)
