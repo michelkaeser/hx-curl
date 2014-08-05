@@ -45,6 +45,8 @@ class Loader
      * @param Int    nargs the number of arguments the function expects
      *
      * @return Dynamic
+     *
+     * @throws hxstd.Error if loading the function fails
      */
     public static function load(fn:String, nargs:Int):Dynamic
     {

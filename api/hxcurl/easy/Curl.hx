@@ -221,7 +221,7 @@ class Curl extends hxcurl.Curl
     /**
      *
      */
-    public function write(bytes:Bytes):Int
+    public function write(bytes:Null<Bytes>):Int
     {
         if (this.handle == null) {
             throw new IllegalStateException();

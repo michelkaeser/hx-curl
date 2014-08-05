@@ -12,7 +12,7 @@ class Curl
     /**
      * Stores the underlaying CURL handle.
      *
-     * @var hxcurl.CurlHandle
+     * @var Null<hxcurl.CurlHandle>
      */
     private var handle:Null<CurlHandle>;
 
