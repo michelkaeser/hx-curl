@@ -7,7 +7,7 @@ import hxcurl.share.CurlOpt;
 import hxstd.IllegalStateException;
 
 /**
- *
+ * Share CURL wrapper class providing the Haxe interface for the underlaying FFI calls (to libcurl).
  */
 class Curl extends hxcurl.Curl
 {
@@ -20,7 +20,9 @@ class Curl extends hxcurl.Curl
 
 
     /**
+     * Constructor to initialize a new share CURL instance.
      *
+     * @throws hxcurl.CurlException if initializing a new CURL handle fails
      */
     public function new():Void
     {
@@ -34,12 +36,17 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Closes all connections this handle has used and possibly has kept open until now.
      *
+     * Don't call this function if you intend to transfer more files.
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function cleanup():Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -50,12 +57,22 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Sets the instance's option 'option' to 'value'.
      *
+     * The value can be pretty much everything, from callback functions to Strings etc.
+     * Make sure to checkout the official libcurl documentation to see which option requires/
+     * supports what kind of value.
+     *
+     * @param hxcurl.share.CurlOpt option the option to set
+     * @param Dynamic              value  the value to set
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function setOption(option:CurlOpt, value:Dynamic):Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {

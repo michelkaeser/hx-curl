@@ -4,6 +4,7 @@ import hxcurl.CurlException;
 import hxcurl.CurlHandle;
 
 /**
+ * Abstract CURL class to be subclassed by concrete implementation.
  *
  * @abstract
  */

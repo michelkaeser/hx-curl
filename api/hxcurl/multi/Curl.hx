@@ -10,7 +10,7 @@ import hxstd.IllegalStateException;
 using StringTools;
 
 /**
- *
+ * Multi CURL wrapper class providing the Haxe interface for the underlaying FFI calls (to libcurl).
  */
 class Curl extends hxcurl.Curl
 {
@@ -27,7 +27,9 @@ class Curl extends hxcurl.Curl
 
 
     /**
+     * Constructor to initialize a new multi CURL instance.
      *
+     * @throws hxcurl.CurlException if initializing a new CURL handle fails
      */
     public function new():Void
     {
@@ -41,12 +43,17 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Adds the easy CURL handle to the current instance.
      *
+     * @param hxcurl.easy.Curl easyCurl the easy CURL handle to add
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function addHandle(easyCurl:hxcurl.easy.Curl):Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -57,12 +64,19 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Closes all connections this handle has used and possibly has kept open until now.
      *
+     * Don't call this function if you intend to transfer more files.
+     *
+     * Attn: Make sure you removed all easy CURL's before calling this function!
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function cleanup():Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -73,12 +87,17 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Performs the actual work using all options set upon calling the method.
      *
+     * @return Int the number of yet working easy CURL handles (0 == done)
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function perform():Int
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -89,12 +108,17 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Removes the easy CURL handle from the current instance.
      *
+     * @param hxcurl.easy.CURL easyCurl the easy CURL to remove
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function removeHandle(easyCurl:hxcurl.easy.Curl):Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -105,12 +129,22 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Sets the instance's option 'option' to 'value'.
      *
+     * The value can be pretty much everything, from callback functions to Strings etc.
+     * Make sure to checkout the official libcurl documentation to see which option requires/
+     * supports what kind of value.
+     *
+     * @param hxcurl.multi.CurlOpt option the option to set
+     * @param Dynamic              value  the value to set
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function setOption(option:CurlOpt, value:Dynamic):Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -121,12 +155,21 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Returns the timout one should wait before checking again if all underlaying
+     * easy CURL handles are done.
      *
+     * This should be called within a while() loop after perform() to check if all
+     * actions have finished.
+     *
+     * @return Int the number of milliseconds one should wait
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function timeout():Int
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {

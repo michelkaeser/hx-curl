@@ -14,7 +14,7 @@ import hxstd.IllegalStateException;
 using StringTools;
 
 /**
- *
+ * Easy CURL wrapper class providing the Haxe interface for the underlaying FFI calls (to libcurl).
  */
 class Curl extends hxcurl.Curl
 {
@@ -36,7 +36,9 @@ class Curl extends hxcurl.Curl
 
 
     /**
+     * Constructor to initialize a new easy CURL instance.
      *
+     * @throws hxcurl.CurlException if initializing a new CURL handle fails
      */
     public function new():Void
     {
@@ -50,26 +52,41 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Closes all connections this handle has used and possibly has kept open until now.
      *
+     * Don't call this function if you intend to transfer more files.
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function cleanup():Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
             Curl._cleanup(this.handle);
+            this.handle = null;
         } catch (ex:Dynamic) {
             throw new CurlException(ex);
         }
     }
 
     /**
+     * Duplicates the current instance.
      *
+     * @return hxcurl.easy.Curl the duplicated CURL
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function duplicate():Curl
     {
+        if (this.handle == null) {
+            throw new IllegalStateException("CURL handle not available");
+        }
+
         var dup:Curl = new Curl();
         try {
             dup.handle = Curl._duphandle(this.handle);
@@ -81,12 +98,17 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Escapes the provided String so it can safely be transfered over a CURL session.
      *
+     * @return String the escaped String
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function escape(str:String):String
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -97,12 +119,21 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Returns the requested CURL information (e.g. time needed to perform an action).
      *
+     * This method should only be called AFTER .perform() has been called.
+     *
+     * @param hxcurl.easy.CurlInfo info the information to get
+     *
+     * @return Dynamic
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function getInfo(info:CurlInfo):Dynamic
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -113,12 +144,17 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Tells the CURL handle to pause itself (or its actions).
      *
+     * @param hxcurl.easy.CurlPause bitmask controls what should be paused
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function pause(bitmask:CurlPause):Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -129,12 +165,17 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Performs the actual work using all options set upon calling the method.
      *
+     * @return haxe.io.Bytes
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function perform():Bytes
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -145,23 +186,30 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Reads up to nbytes Bytes from the instance's input stream.
      *
+     * @param Int nbytes the number of Bytes to read
+     *
+     * @return haxe.io.Bytes the read Bytes
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
-    public function read(bytes:Int = 1024):Bytes
+    public function read(nbytes:Int = 1024):Bytes
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
-        if (bytes < 0) {
+        if (nbytes < 0) {
             throw new IllegalArgumentException("Cannot read a negative amount of bytes");
         }
 
         var read:Bytes;
-        if (bytes == 0) {
+        if (nbytes == 0) {
             read = Bytes.alloc(0);
         } else {
             try {
-                read = Bytes.ofData(Curl._recv(this.handle, bytes));
+                read = Bytes.ofData(Curl._recv(this.handle, nbytes));
             } catch (ex:Dynamic) {
                 throw new CurlException(ex);
             }
@@ -171,12 +219,15 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Resets the CURL handle so it behaves as it would have been newly initialized.
      *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function reset():Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -187,12 +238,22 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Sets the instance's option 'option' to 'value'.
      *
+     * The value can be pretty much everything, from callback functions to Strings etc.
+     * Make sure to checkout the official libcurl documentation to see which option requires/
+     * supports what kind of value.
+     *
+     * @param hxcurl.easy.CurlOpt option the option to set
+     * @param Dynamic             value  the value to set
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function setOption(option:CurlOpt, value:Dynamic):Void
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -203,12 +264,19 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Unescapes the escaped String.
      *
+     * @param String str the String to unescape
+     *
+     * @return String the unescaped String
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function unescape(str:String):String
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         try {
@@ -219,12 +287,19 @@ class Curl extends hxcurl.Curl
     }
 
     /**
+     * Writes the Bytes to the instance's output stream.
      *
+     * @param Null<haxe.io.Bytes> bytes the Bytes to write
+     *
+     * @return Int the number of written Bytes
+     *
+     * @throws hxstd.IllegalStateException if the instance has already been cleaned
+     * @throws hxcurl.CurlException        if the FFI call raises an error
      */
     public function write(bytes:Null<Bytes>):Int
     {
         if (this.handle == null) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("CURL handle not available");
         }
 
         var sent:Int;
