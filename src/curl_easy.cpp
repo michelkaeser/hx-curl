@@ -471,7 +471,7 @@ value hx_curl_easy_setopt(value curl, value curlopt, value optval)
             break;
         }
         case CURLOPT_READFUNCTION: {
-            root_set(&ecurl->callbacks->progress, optval);
+            root_set(&ecurl->callbacks->read, optval);
             ret = curl_easy_setopt(ecurl->handle, CURLOPT_READFUNCTION, read_callback);
             if (ret == CURLE_OK) {
                 ret = curl_easy_setopt(ecurl->handle, CURLOPT_READDATA, ecurl);
@@ -567,10 +567,35 @@ static int progress_callback(void* clientp, double dltotal, double dlnow, double
 }
 
 
-static size_t read_callback(char* buffer, size_t size, size_t nitems, void* instream)
+static size_t read_callback(char* outstream, size_t size, size_t nitems, void* instream)
 {
-    return 0;
-    // fill buffer with size * nitems bytes from instream
+    const size_t length = size * nitems;
+    ECURL* ecurl = (ECURL*)instream;
+    int written = 0;
+    if (length > 0) {
+        value ret;
+        if (ecurl->data->read == NULL) {
+            ret = val_call1(ecurl->callbacks->read->get(), alloc_int(length));
+        } else {
+            ret = val_call2(ecurl->callbacks->read->get(), alloc_int(length), ecurl->data->read);
+        }
+
+        const char* data;
+        size_t      datalen;
+        if (val_is_string(ret)) { // Neko
+            data    = val_string(ret);
+            datalen = val_strlen(ret);
+        } else { // C++
+            buffer buf = val_to_buffer(ret);
+            data       = buffer_data(buf);
+            datalen    = buffer_size(buf);
+        }
+        memcpy(outstream, data, datalen);
+
+        written = datalen;
+    }
+
+    return written;
 }
 
 
