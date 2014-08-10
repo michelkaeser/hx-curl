@@ -51,7 +51,11 @@ class Loader
     public static function load(fn:String, nargs:Int):Dynamic
     {
         try {
-            return Lib.load(Loader.library, fn, nargs);
+            #if HXCURL_LOADLAZY
+                return Lib.loadLazy(Loader.library, fn, nargs);
+            #else
+                return Lib.load(Loader.library, fn, nargs);
+            #end
         } catch (ex:Dynamic) {
             throw new Error(ex);
         }

@@ -2,6 +2,10 @@
 
 > Haxe (C++/Neko) language bindings for libcurl.
 
+## Compilation Flags
+
+`-D HXCURL_LOADLAZY` which will load the `.ndll` method implementations using the `.Lib.loadLazy` method rather than using normal `load`.
+
 ## Nullability
 
 Haxe has a special type `Null<T>` which is mainly for documentation purpose and for static platforms (so e.g. `Int` can be `null`). You can find its typedef here: http://api.haxe.org/Null.html
