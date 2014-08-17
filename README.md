@@ -2,6 +2,25 @@
 
 > Haxe (C++/Neko) language bindings for libcurl.
 
+## Build steps
+
+You need the `hxcpp` library from `haxelib`:
+
+    haxelib install hxcpp
+
+as well as the `libcurl` development and runtime files:
+
+    apt-get install libcurl3 libcurl4-openssl-dev // Debian/Ubuntu etc.
+    yum install libcurl libcurl-devel // CentOS/RHEL etc.
+
+afterwards, all is magic:
+
+    git clone -b develop git@github.com:MaddinXx/hxcurl.git
+    cd hxcurl
+    haxelib run hxcpp -DHXCPP_M64 build/build.hxml
+
+> Use `-DHXCPP_M32` if on 32-bit system!
+
 ## Compilation Flags
 
 `-D HXCURL_LOADLAZY` which will load the `.ndll` method implementations using the `.Lib.loadLazy` method rather than using normal `load`.
