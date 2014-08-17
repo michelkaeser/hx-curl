@@ -11,7 +11,7 @@ You need the `hxcpp` library from `haxelib`:
 as well as the `libcurl` development and runtime files:
 
     apt-get install libcurl3 libcurl4-openssl-dev // Debian/Ubuntu etc.
-    yum install libcurl libcurl-devel // CentOS/RHEL etc.
+    yum install libcurl libcurl-devel             // CentOS/RHEL etc.
 
 afterwards, all is magic:
 
