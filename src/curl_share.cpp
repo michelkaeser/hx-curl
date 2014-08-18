@@ -62,7 +62,7 @@ value hx_curl_share_cleanup(value curl)
         finalize_share_curl_handle(scurl->handle);
         scurl->cleanup = false;
     } else {
-        neko_error();
+        val_throw(alloc_string("cURL share handle already cleaned-up"));
     }
 
     return alloc_null();
@@ -75,7 +75,7 @@ value hx_curl_share_init(void)
     value val;
     CURLSH* handle = curl_share_init();
     if (handle == NULL) {
-        neko_error();
+        val_throw(alloc_string("Error initializing a new cURL share handle"));
         val = alloc_null();
     } else {
         SCURL* scurl     = malloc_share_curl();

@@ -139,7 +139,7 @@ value hx_curl_easy_cleanup(value curl)
         finalize_easy_curl_handle(ecurl->handle);
         ecurl->cleanup = false;
     } else {
-        neko_error();
+        val_throw(alloc_string("cURL easy handle has already been cleaned-up"));
     }
 
     return alloc_null();
@@ -155,7 +155,7 @@ value hx_curl_easy_duphandle(value curl)
     ECURL* ecurl  = val_easy_curl(curl);
     CURL* dhandle = curl_easy_duphandle(ecurl->handle);
     if (dhandle == NULL) {
-        neko_error();
+        val_throw(alloc_string("An error encountered when trying to duplicate the cURL handle"));
         dval = alloc_null();
     } else {
         ECURL* dup     = malloc_easy_curl();
@@ -183,7 +183,7 @@ value hx_curl_easy_escape(value curl, value str)
     value val;
     char* escaped = curl_easy_escape(val_easy_handle(curl), val_string(str), val_strlen(str));
     if (escaped == NULL) {
-        neko_error();
+        val_throw(alloc_string("An error encountered when trying to escape the input string"));
         val = alloc_null();
     } else {
         val = alloc_string(escaped);
@@ -217,7 +217,7 @@ value hx_curl_easy_getinfo(value curl, value info, value type)
         }
         default: {
             // TODO: implement the three struct info types
-            neko_error();
+            val_throw(alloc_string("Requested information type not yet implemented"));
             val = alloc_null();
         }
     }
@@ -277,7 +277,7 @@ value hx_curl_easy_init(void)
     value val;
     CURL* handle = curl_easy_init();
     if (handle == NULL) {
-        neko_error();
+        val_throw(alloc_string("Error initializing a new cURL easy handle"));
         val = alloc_null();
     } else {
         ECURL* ecurl     = malloc_easy_curl();
@@ -365,6 +365,7 @@ value hx_curl_easy_recv(value curl, value length)
         val = buffer_val(b);
     } else {
         curl_easy_error(ret);
+        val = alloc_int(ret);
     }
 
     return val;
@@ -505,7 +506,7 @@ value hx_curl_easy_setopt(value curl, value curlopt, value optval)
                     ret = curl_easy_setopt(ecurl->handle, (CURLoption)val_int(curlopt), val_string(optval));
                     break;
                 }
-                default: { neko_error(); }
+                default: { val_throw(alloc_string("Unsupported cURL easy option specified")); }
             }
         }
     }
@@ -527,7 +528,7 @@ value hx_curl_easy_unescape(value curl, value str)
     value val;
     char* unescaped = curl_easy_unescape(val_easy_handle(curl), val_string(str), val_strlen(str), NULL);
     if (unescaped == NULL) {
-        neko_error();
+        val_throw(alloc_string("An error encountered when trying to unescape the input string"));
         val = alloc_null();
     } else {
         val = alloc_string(unescaped);

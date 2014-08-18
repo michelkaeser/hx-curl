@@ -76,7 +76,7 @@ value hx_curl_multi_cleanup(value curl)
             curl_multi_error(ret);
         }
     } else {
-        neko_error();
+        val_throw(alloc_string("cURL multi handle already cleaned-up"));
     }
 
     return alloc_null();
@@ -89,7 +89,7 @@ value hx_curl_multi_init(void)
     value val;
     CURLM* handle = curl_multi_init();
     if (handle == NULL) {
-        neko_error();
+        val_throw(alloc_string("Error initializing a new cURL multi handle"));
         val = alloc_null();
     } else {
         MCURL* mcurl     = malloc_multi_curl();
@@ -192,7 +192,7 @@ value hx_curl_multi_setopt(value curl, value curlopt, value optval)
                     ret = curl_multi_setopt(mcurl->handle, (CURLMoption)val_int(curlopt), val_string(optval));
                     break;
                 }
-                default: { neko_error(); }
+                default: { val_throw(alloc_string("Unsupported cURL multi option specified")); }
             }
         }
     }

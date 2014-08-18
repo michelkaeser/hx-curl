@@ -13,7 +13,6 @@
     <files id="files">
         <!-- Set up include folder paths -->
         <compilerflag value="-I./include" />
-        <compilerflag value="-I./../include" />
 
         <!-- List of cpp files to be compiled -->
         <file name="src/curl_easy.cpp" />
